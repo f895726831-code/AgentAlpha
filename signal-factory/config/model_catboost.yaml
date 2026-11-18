@@ -1,4 +1,4 @@
-# CatBoost 模型配置 — quant-signal-factory
+# CatBoost 模型配置 — signal-factory
 # 与 LightGBM baseline 相同的数据处理和回测配置，仅模型不同
 # CatBoost 优势: 对类别特征友好、无序梯度提升、GPU 加速
 

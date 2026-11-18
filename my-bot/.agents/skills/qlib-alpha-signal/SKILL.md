@@ -1,11 +1,11 @@
 ---
 name: qlib-alpha-signal
-description: Qlib ML Alpha 信号生成 — 使用 quant-signal-factory 的 GBDT/XGBoost/LSTM/TabNet 模型对全市场标的生成定量 alpha 排名，作为 Stage 1 选股的第六个 skill，与 Agent 定性选股并行运行。读取 data/output/alpha_signals.json 获取 ML 排名，与 Agent 选股结果取交集优先。
+description: Qlib ML Alpha 信号生成 — 使用 signal-factory 的 GBDT/XGBoost/LSTM/TabNet 模型对全市场标的生成定量 alpha 排名，作为 Stage 1 选股的第六个 skill，与 Agent 定性选股并行运行。读取 data/output/alpha_signals.json 获取 ML 排名，与 Agent 选股结果取交集优先。
 ---
 
 # Qlib Alpha 信号 (Qlib Alpha Signal)
 
-使用 quant-signal-factory（RD-Agent + Qlib 自动化量化信号工厂）的 ML 模型对全市场标的生成定量 alpha 排名，弥补 Agent 定性选股的盲区。
+使用 signal-factory（RD-Agent + Qlib 自动化量化信号工厂）的 ML 模型对全市场标的生成定量 alpha 排名，弥补 Agent 定性选股的盲区。
 
 ## 核心理念
 
@@ -104,7 +104,7 @@ B \ A → 低置信度（ML 独有，提示 Agent 复核是否遗漏）
 
 ## 模型信息
 
-quant-signal-factory 提供 5 个预配置模型：
+signal-factory 提供 5 个预配置模型：
 
 | 模型 | 类型 | 训练频率 | GPU | 说明 |
 |---|---|---|---|---|
@@ -157,21 +157,21 @@ python -c "from src.factors import list_models, get_active_models; print(list_mo
 
 ## 与管线其他技能的关系
 
-- **上游**: `sync_data.py` (quant-signal-factory) — 提供 Qlib bin 数据
+- **上游**: `sync_data.py` (signal-factory) — 提供 Qlib bin 数据
 - **同级**: Stage 1 的 5 个选股 skill — 并行运行，结果取交集
 - **下游**: `backtester` (Gate 1) — 接收 ML 交叉验证标记的候选列表
 - **下游**: `signal-gen` — 接收合并后的选股结果
 
 ## 信号工厂架构参考
 
-quant-signal-factory 是一个独立的 22 模块 Python 项目，通过 JSON 契约与 FM_trade 松耦合：
+signal-factory 是一个独立的 22 模块 Python 项目，通过 JSON 契约与 AgentAlpha 松耦合：
 
 ```
-quant-signal-factory/
+signal-factory/
 ├── src/data/           # PIT 引擎 + 泄漏检测 + Wind 数据桥 + 配置加载
 ├── src/factors/        # RD-Agent 因子挖掘 + 模型配置 + Alpha 信号生成
 ├── src/backtest/       # Qlib 回测适配 + 信号生成器 + Gate 1 评分
-├── src/export/         # FM_trade JSON 契约导出
+├── src/export/         # AgentAlpha JSON 契约导出
 ├── config/             # YAML 配置
 └── scripts/            # CLI 入口
 ```

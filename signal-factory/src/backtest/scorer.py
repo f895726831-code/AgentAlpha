@@ -1,7 +1,7 @@
 """
 Gate 1 评分卡 — 从 Qlib 回测结果计算 5 维评分
 
-从 FM_trade scripts/qlib/gate1_scorer.py 迁移，增强：
+从 AgentAlpha scripts/qlib/gate1_scorer.py 迁移，增强：
   - 与 PIT 验证结果联动
   - 因子 IC 衰减纳入稳健性评估
 """

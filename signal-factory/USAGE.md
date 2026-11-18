@@ -1,14 +1,14 @@
 # Quant Signal Factory — 使用指南
 
 > RD-Agent + Qlib 自动化量化信号工厂  
-> 22 个模块，5 层架构，零摩擦集成 FM_trade
+> 22 个模块，5 层架构，零摩擦集成 AgentAlpha
 
 ---
 
 ## 架构总览
 
 ```
-                         quant-signal-factory
+                         signal-factory
 ┌──────────────────────────────────────────────────────────────────────┐
 │                                                                      │
 │  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐         │
@@ -29,7 +29,7 @@
 └──────────────────────────────────────────────────────────────────────┘
         │                                                      │
         ▼                                                      ▼
-  Wind MCP 数据                                        FM_trade 管线
+  Wind MCP 数据                                        AgentAlpha 管线
   (行情/财务)                                    data/output/alpha_signals.json
 ```
 
@@ -404,7 +404,7 @@ from src.backtest.signal_generator import (
 
 ## 导出层 (src/export/)
 
-### 11. FM_trade JSON 契约
+### 11. AgentAlpha JSON 契约
 
 ```python
 from src.export.export_signals import export_daily_signals
@@ -420,12 +420,12 @@ result = export_daily_signals(
 
 ---
 
-## 与 FM_trade 集成
+## 与 AgentAlpha 集成
 
 ### 数据流
 
 ```
-Wind MCP                    quant-signal-factory              FM_trade
+Wind MCP                    signal-factory              AgentAlpha
 ───────                     ────────────────────              ───────
                                                               Stage 0
                                                                  │
@@ -460,7 +460,7 @@ python -m src.factors.rd_runner --config config/rd_agent.yaml
 
 ### 信号工厂不可用时的降级
 
-FM_trade 读取 `data/output/alpha_signals.json`。如果文件不存在（信号工厂未运行），FM_trade 自动降级为纯 Agent 定性选股，不阻塞管线。
+AgentAlpha 读取 `data/output/alpha_signals.json`。如果文件不存在（信号工厂未运行），AgentAlpha 自动降级为纯 Agent 定性选股，不阻塞管线。
 
 ---
 

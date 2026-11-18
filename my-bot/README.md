@@ -1,65 +1,84 @@
-# my-bot
+# AgentAlpha — AI Agent 决策管线（my-bot）
 
-My AI agent harness — 趋势交易量化决策系统
-
-> **Pipeline v4.3** — 三模式自适应管线 + 六阶段三关口 + 量化信号工厂集成 | 19 核心技能 | Wind MCP + Qlib 双引擎
-> Generated with [`create-agent-harness`](https://github.com/ruvnet/agent-harness-generator) — `vertical:trading` template. **Paper mode by default.**
+> **Pipeline v5.0** — 三层信号架构 + 三模式自适应 + 三道 Gate
+> 自研 Agent 技能 3 个（第三方技能按需安装，见 [docs/SKILLS.md](../docs/SKILLS.md)）｜Wind MCP + Qlib 双引擎
+> 仅用于研究与学习，默认 **Paper 模式**，不构成投资建议。
 
 ## 管线架构
 
 ```
-Stage 0         Stage 1        [Gate 1]     Stage 2       [Gate 2]      Stage 3        Stage 4
-全市场初筛  →  环境+选股  →   回测关   →  信号确认  →  多空论战关  →  交易执行  →  风控退出
-(1 skill)      (7 skills)     (1 agent)    (2 skills)    (1 skill)     (4 skills)     (4 skills)
-
-market_wide    market_regime   backtester   gap_open      bull_bear     dip_buy        stop_loss
-scanner        breakout_                     interpreter   _debate       decision       discipline
-(v4.3新增)     candidate_                   volume_        _gate         trade_plan     take_profit
-               finder                       spike_         (v4.3新增)    builder        _ladder
-               pullback_                    reasoning                    breakout_      failed_
-               opportunity_                                              trade_         breakout_
-               finder                                                    execution      exit
-               vcp_breakout_                                            position_      support_
-               scan                                                     sizing_        break_
-               canslim_                                                 decision       warning
-               growth_scan
-               a_share_primary
-               _theme
-               qlib_alpha
-               _signal
+Layer 0 宏观大类资产配置（11 类资产，HMM + MVO/BL）
+   ↓
+Layer 1 板块轮动 ML（31 个申万行业 GBDT/XGBoost）
+   ↓
+Layer 2 个股选择（Pipeline v5.0）
+   Stage 0    全市场初筛（market_wide_scanner）
+   Stage 0.3  主题扩展（theme_expand）
+   Stage 1    环境判断 + 选股（7 策略）
+   Gate 1     回测关（5 维评分 + 反过拟合）
+   Stage 2    信号确认（跳空 / 放量归因）
+   Gate 2     多空论战关（六维加权）
+   Stage 3    交易执行（仓位 / 计划）
+   Gate 3     风控关（集中度 / 熔断）
+   Stage 4    风控退出（止损 / 止盈）
 ```
 
-### 三道关卡
+### 三道 Gate
 
-| 关卡 | 版本 | 位置 | 职能 |
-|------|------|------|------|
-| **Gate 1 回测关** | v4.1 | Stage 1→2 | 五维评分 + 三层反过拟合（样本外留出/复杂度惩罚/滚动窗口），必须 ≥70 分 Deploy 才能进入选股 |
-| **Gate 2 多空论战关** | v4.3 | Stage 2→3 | 六维加权评分（技术30%/资金流15%/拥挤10%/基本面20%/情绪15%/宏观10%），绿灯/黄灯/橙灯/红灯四级决策 |
-| **Gate 3 风控关** | v4.0 | Stage 4 | 仓位/集中度/熔断校验，参数按模式动态切换 |
+| Gate | 位置 | 职能 |
+|---|---|---|
+| **Gate 1 回测关** | Stage 1→2 | 五维评分 + 三层反过拟合（样本外留出 / 复杂度惩罚 / 滚动窗口），通过 Deploy 才进入选股 |
+| **Gate 2 多空论战关** | Stage 2→3 | 六维加权（技术 30% / 资金流 15% / 拥挤 10% / 基本面 20% / 情绪 15% / 宏观 10%），红黄绿灯决策 |
+| **Gate 3 风控关** | Stage 4 | 仓位 / 集中度 / 熔断校验，参数随模式动态调整 |
 
 ### 三模式自适应
 
 | 优先级 | 模式 | 触发条件 | 行为 |
-|--------|------|----------|------|
-| 1 (最高) | `risk_off` | market_regime 判为"防守" | 选股降级为仅观察，不建仓，风控收紧。退出需分阶段（risk_off→震荡→进攻） |
-| 2 | `earnings_season` | 月份 ∈ {1,2,3,4,7,8,10} | 激活财报子管线，盘前/盘后闭环增强 |
-| 3 (默认) | `normal` | 以上条件均不满足 | 标准六阶段管线 |
+|---|---|---|---|
+| 1 | `risk_off` | market_regime 判为"防守" | 选股降级为仅观察、不建仓，风控收紧 |
+| 2 | `earnings_season` | 月份 ∈ {1,2,3,4,7,8,10} | 激活财报子管线，盘前/盘后增强 |
+| 3 | `normal` | 其他 | 标准五阶段管线 |
 
-### 量化信号工厂集成
+## 与 Signal Factory 集成
 
-通过 `scripts/sync_signal_factory.py` 与 `D:/AgentAlpha/signal-factory` 松耦合集成：
-- **模型**: CatBoost（CSI 300 成分股，Alpha158 特征，2015-2026 训练）
-- **覆盖**: 77,994 只标的，12 个 RD-Agent 生成因子
-- **集成方式**: ML Top 50 ∩ Agent 选股 = 高置信优先；纯 ML / 纯 Agent = 需额外论证
+通过 `scripts/sync_signal_factory.py` 与 `../signal-factory` 松耦合：
 
-## Install
+- **信号**：`alpha_signals*.json`（含 `@contract` 元数据、universe、staleness）、`sector_signals.json`、`asset_allocation.json`
+- **模型**：GBDT / XGBoost / CatBoost 集成，Alpha158/360 特征，CSI 300 / 500 股票池
+- **集成方式**：ML Top 50 ∩ Agent 选股 = 高置信优先；信号缺失或过期时降级为纯 Agent 定性选股
+
+## 快速开始
 
 ```bash
-npm install -g my-bot
-my-bot init
-my-bot backtest --strategy default --period 2025-01-01:2025-12-31
+cd my-bot
+npm ci
+npm test               # 97 tests
+node bin/cli.js init   # 初始化
+node bin/cli.js doctor # 环境自检
 ```
+
+数据与路径：
+
+- `scripts/qlib/config.json`：Qlib 根目录、bin 数据路径（按本机修改）
+- `data/`：只保留默认配置（`risk-policy.json`、`sector-map.json`、`blacklist.json` 等），运行数据被 `.gitignore` 排除
+- 第三方技能安装：`npx skills add Wind-Information-Co-Ltd/wind-skills --skill <name> -g -y`
+
+## 目录
+
+```
+my-bot/
+├── src/            # agents / strategies / data
+├── scripts/        # 数据同步、信号追踪、Qlib 桥、WSL2 因子实验
+├── bin/            # CLI
+├── docs/           # 管线架构、运维、排障、报告模板
+├── tests/          # 单元测试
+└── data/           # 默认配置（不含个人数据）
+```
+
+## 免责声明
+
+本项目仅供研究与学习，不构成投资建议。实盘交易风险由使用者自行承担；回测表现不代表未来收益。
 
 ## License
 
-MIT — but **trading carries risk**. Past backtest performance does not predict future results. You're responsible for any losses.
+MIT

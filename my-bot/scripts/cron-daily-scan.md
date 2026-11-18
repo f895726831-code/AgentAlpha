@@ -19,7 +19,7 @@
 
 ### 前置步骤
 
-1. 读取 `CLAUDE.md` 了解完整管线 **v4.3** 规则（三道关卡、模式判断、风控参数、技能调用链）
+1. 读取 `CLAUDE.md` 了解完整管线 **v5.0** 规则（三道关卡、模式判断、风控参数、技能调用链）
 2. 读取 `my-bot/docs/pipeline-architecture.md` 第 11.1 节"完整扫描流程"作为执行模板
 3. 读取 `portfolio.json` 获取当前持仓，用于标记已持仓标的
 4. **★Layer 0 宏观配置**: 读取 `data/output/_layer0_summary.md` 获取目标资产权重。若不存在则跳过。
@@ -30,7 +30,7 @@
 9. **★P1 因子共识信号 (v5.0)**: 读取 `data/output/alpha_signals_p1.json` 获取 Phase 1 37 因子 IC 加权共识排名。P1 与 ML 信号源**正交**（P1 偏好 sh6* 上海主板，ML 偏好 sz3* 创业板），重叠率约 5%。读取 `data/output/v4.3-vs-v5.0-comparison.json` 获取双轨对比数据。若 P1 文件不存在或 stale（excess_lag_days > 2），标注 `P1_UNAVAILABLE` 但不阻塞扫描。
 10. **★止损黑名单 (W46 #3)**: 读取 `data/blacklist.json` 获取 ML 信号跟踪器自动维护的止损黑名单。格式：`{"code": {"ban_until": "YYYY-MM-DD", "occurrences": N, "reason": "..."}}`。黑名单标的在 Stage 0 全市场初筛和 Level 0 标的合并阶段**硬过滤**（直接剔除，不进入任何后续分析）。盘中/盘前报告中，持仓标的若在黑名单中→标注"🚫 BLACKLISTED"但不影响已有持仓管理。
 
-### ★三层架构报告结构（v4.3 强制）
+### ★三层架构报告结构（v5.0 强制）
 
 **报告章节顺序**：
 ```
@@ -77,7 +77,7 @@
 | 7 | **交叉验证** | 写入报告前，必须将报告中所有持仓数量与 `portfolio.json` 逐条对比。发现不一致 → 以 `portfolio.json` 为准修正。 |
 | 8 | **★CSI300 数据源硬约束（v4.3.1）** | 沪深300 K线数据**必须优先读取 `data/output/_csi300_daily.json`**（由 EOD cron 15:30 预生成）。这是权威数据源。**禁止使用 `get_stock_kline` 作为 CSI300 指数的替代数据源**——该端点数据滞后更严重（曾导致 10/22 vs 10/23 差异）。若 `_csi300_daily.json` 不存在或 `data_date` 非上一个交易日，标注 `DEGRADED: CSI300 K线数据滞后` 并说明滞后天数，但不要尝试用其他端点补救。 |
 
-### ★ML Alpha 信号集成（quant-signal-factory）
+### ★ML Alpha 信号集成（signal-factory）
 
 > 信号工厂每日盘前自动运行 ensemble 模型，产出全市场 alpha 排名。
 > 读取 data/output/alpha_signals.json 获取 ML 排名，作为 Stage 0 全市场初筛的量化过滤器。
@@ -117,7 +117,7 @@
    - 但如果 market_regime 判为"防守" → 覆盖为 `risk_off`
 4. 输出当前模式标记，贯穿后续所有步骤
 
-### 第二阶段：Stage 0 — 全市场初筛（v4.3 新增）
+### 第二阶段：Stage 0 — 全市场初筛（v5.0 新增）
 
 > 利用 Wind `search_stocks` 从全市场 5000+ 只股票中筛选，弥补自选池的局限。
 > 详细技能定义见 `my-bot/.agents/skills/market-wide-scanner/SKILL.md`，模板定义见 `references/templates.md`。

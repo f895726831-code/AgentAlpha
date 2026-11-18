@@ -203,8 +203,8 @@ if ($IsMonday) {
         Write-Log "  Factor combine error: $_"
     }
 
-    # ─── Export to FM_trade ───
-    Write-Log "Step 3: Export to FM_trade"
+    # ─── Export to AgentAlpha ───
+    Write-Log "Step 3: Export to AgentAlpha"
     try {
         $exportPath = Join-Path $ProjectRoot "data\output\factor_lab_weekly.json"
         $combineResult | ConvertTo-Json -Depth 4 | Out-File -FilePath $exportPath -Encoding utf8

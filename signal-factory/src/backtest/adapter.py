@@ -1,7 +1,7 @@
 """
 Qlib 回测适配器 — 封装 Qlib backtest 完整生命周期
 
-从 FM_trade scripts/qlib/backtest_adapter.py 迁移，增强：
+从 AgentAlpha scripts/qlib/backtest_adapter.py 迁移，增强：
   - 信号生成强制通过 PIT 验证
   - 更完善的错误处理
   - 支持批量回测

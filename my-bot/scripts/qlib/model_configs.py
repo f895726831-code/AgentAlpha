@@ -1,7 +1,7 @@
 """
-FM_trade 模型配置 — 桥接层 (底层: quant-signal-factory)
+AgentAlpha 模型配置 — 桥接层 (底层: signal-factory)
 
-从 QSF src/factors/model_configs.py 导入，保持 FM_trade API 兼容。
+从 QSF src/factors/model_configs.py 导入，保持 AgentAlpha API 兼容。
 """
 
 from __future__ import annotations
@@ -27,9 +27,9 @@ from src.factors.model_configs import (
     export_configs,
 )
 
-# ─── FM_trade 兼容层 ───
+# ─── AgentAlpha 兼容层 ───
 
-# 模型名映射: FM_trade name → QSF name
+# 模型名映射: AgentAlpha name → QSF name
 _MODEL_NAME_MAP = {
     "gbdt_alpha158": "gbdt",
     "xgboost_alpha158": "xgboost",
@@ -43,9 +43,9 @@ DEFAULT_HANDLER_MODULE = "qlib.contrib.data.handler"
 DEFAULT_DATASET_CLASS = "DatasetH"
 DEFAULT_DATASET_MODULE = "qlib.data.dataset"
 
-# 从 QSF ModelConfig 生成 FM_trade 兼容的 dict 格式
+# 从 QSF ModelConfig 生成 AgentAlpha 兼容的 dict 格式
 def _qsf_to_preset_dict(cfg: ModelConfig) -> Dict[str, Any]:
-    """将 QSF ModelConfig 转为 FM_trade PRESET_MODELS dict 格式"""
+    """将 QSF ModelConfig 转为 AgentAlpha PRESET_MODELS dict 格式"""
     return {
         "class": cfg.model_class,
         "module_path": cfg.module_path,

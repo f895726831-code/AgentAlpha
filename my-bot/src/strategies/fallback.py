@@ -192,7 +192,7 @@ class FallbackHandler:
         signals_context = context.get("signals", [])
         positions_context = context.get("positions", [])
 
-        system_prompt = """你是 FM_trade v5.0 的应急决策 Agent。当 TiMi 策略引擎检测到异常时，
+        system_prompt = """你是 AgentAlpha v5.0 的应急决策 Agent。当 TiMi 策略引擎检测到异常时，
 你作为 LLM 回退层被激活。你需要基于异常上下文做出应急决策。
 
 ## 输出格式

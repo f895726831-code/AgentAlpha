@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-P0 Bridge: FactorRegistry → quant-signal-factory contract JSON
+P0 Bridge: FactorRegistry → signal-factory contract JSON
 
 读取 FactorRegistry 中的 GFlowNet 因子，转换为 export_signals.py 可消费的
-factor_results JSON，然后生成 FM_trade 契约。
+factor_results JSON，然后生成 AgentAlpha 契约。
 
 流程:
   1. 读取 factor_registry.json（或直接使用已注册的 FactorRegistry）
   2. 过滤 gflownet 通道的因子
   3. 转换为 factor_results 格式
-  4. 调用 fm_trade_bridge.generate_contract() 生成契约
-  5. 保存到 quant-signal-factory/data/output/signals/{date}.json
+  4. 调用 agent_alpha_bridge.generate_contract() 生成契约
+  5. 保存到 signal-factory/data/output/signals/{date}.json
 
 用法:
   cd D:\AgentAlpha\my-bot\scripts\wsl2
@@ -29,7 +29,7 @@ WSL2_DIR = SCRIPT_DIR.parent
 FM_TRADE_DIR = WSL2_DIR.parent  # my-bot/
 sys.path.insert(0, str(WSL2_DIR))
 
-# quant-signal-factory paths
+# signal-factory paths
 QSIG_DIR = Path("D:/AgentAlpha/signal-factory")
 QSIG_SRC = QSIG_DIR / "src"
 sys.path.insert(0, str(QSIG_DIR))
@@ -44,7 +44,7 @@ def registry_to_factor_results(
 ) -> dict:
     """
     Convert FactorRegistry entries to the factor_results format
-    expected by export_signals.py / fm_trade_bridge.py.
+    expected by export_signals.py / agent_alpha_bridge.py.
     """
     factors = registry.get_by_channel(channel)
 
@@ -94,7 +94,7 @@ def registry_to_factor_results(
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="FactorRegistry → FM_trade contract bridge")
+    parser = argparse.ArgumentParser(description="FactorRegistry → AgentAlpha contract bridge")
     parser.add_argument("--min-ic", type=float, default=0.02,
                         help="Minimum |IC| threshold (default: 0.02)")
     parser.add_argument("--date", type=str, default=None,
@@ -147,8 +147,8 @@ def main():
         print("[Dry-run] Stopping before contract generation.")
         return 0
 
-    # ─── 4. Generate FM_trade contract ───
-    from src.export.fm_trade_bridge import generate_contract, save_contract
+    # ─── 4. Generate AgentAlpha contract ───
+    from src.export.agent_alpha_bridge import generate_contract, save_contract
 
     contract = generate_contract(
         factor_results=factor_results,
@@ -174,7 +174,7 @@ def main():
     for w in contract.get("warnings", []):
         print(f"  WARNING: {w}")
 
-    # ─── 5. Also save a copy to FM_trade output dir ───
+    # ─── 5. Also save a copy to AgentAlpha output dir ───
     fm_output = FM_TRADE_DIR / "data/output"
     fm_output.mkdir(parents=True, exist_ok=True)
     fm_contract_path = fm_output / f"signal_factory_gfn_{run_date}.json"

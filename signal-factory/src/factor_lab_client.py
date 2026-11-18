@@ -1,7 +1,7 @@
 """
 factor-lab API 客户端
 
-Windows 端 quant-signal-factory 通过 localhost:8700 调用 WSL2 factor-lab 的
+Windows 端 signal-factory 通过 localhost:8700 调用 WSL2 factor-lab 的
 RD-Agent 因子挖掘和论文因子挖掘能力。
 
 factor-lab 启动后，WSL2 端口会自动转发到 Windows localhost。

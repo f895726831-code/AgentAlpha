@@ -1,6 +1,6 @@
 # Quant Signal Factory — 自然语言指令集
 
-> 适用版本: quant-signal-factory v1.0 | 22 模块 | 日期: 2026-08-07
+> 适用版本: signal-factory v1.0 | 22 模块 | 日期: 2026-08-07
 > 通过自然语言操控信号工厂的完整数据→因子→回测→导出管线。
 
 ---
@@ -389,10 +389,10 @@ for name, fn in [("breakout_60", generate_breakout_60), ...]:
 ### 7.1 导出每日信号
 
 ```
-【信号导出】将今日 Alpha 信号导出为 FM_trade 可读的 JSON 契约：
+【信号导出】将今日 Alpha 信号导出为 AgentAlpha 可读的 JSON 契约：
 
 1. 读取 data/output/alpha_signals.json
-2. 按 FM_trade 契约格式转换
+2. 按 AgentAlpha 契约格式转换
 3. 输出到 data/output/signals/2026-08-07.json
 
 Python API:
@@ -403,7 +403,7 @@ result = export_daily_signals(date="2026-08-07", output_dir="data/output/signals
 ### 7.2 查看信号契约
 
 ```
-【信号契约】查看 FM_trade 集成的 JSON 格式：
+【信号契约】查看 AgentAlpha 集成的 JSON 格式：
 
 契约格式:
 {
@@ -479,7 +479,7 @@ print(get_qlib_bin_dir())  # 已使用新配置
 1. 数据同步: Wind MCP → Qlib CSV → Qlib bin
 2. 模型训练: 检查是否需要重训（每周六重训 GBDT）
 3. Alpha 预测: GBDT + XGBoost 集成 → 全市场排名 Top 50
-4. 信号导出: 转换为 FM_trade JSON 契约
+4. 信号导出: 转换为 AgentAlpha JSON 契约
 5. 输出: data/output/alpha_signals.json + data/output/signals/{date}.json
 
 使用:
@@ -537,7 +537,7 @@ python -m src.factors.alpha_signals --ensemble --models gbdt xgboost gbdt_large
 
 ---
 
-## 十、与 FM_trade 集成
+## 十、与 AgentAlpha 集成
 
 ### 10.1 在管线中调用 ML 信号
 
@@ -574,7 +574,7 @@ python -m src.factors.alpha_signals --ensemble --models gbdt xgboost gbdt_large
 ### 10.3 手动触发信号生成
 
 ```
-【手动触发】在 FM_trade 中手动触发信号工厂：
+【手动触发】在 AgentAlpha 中手动触发信号工厂：
 
 1. 切换到信号工厂目录
 2. 运行集成模式
@@ -596,7 +596,7 @@ cat data/output/alpha_signals.json | python -m json.tool | head -30
 
 1. 检查 config/data.yaml 中 bin_dir 路径是否正确
 2. 运行 python scripts/sync_data.py --summary 查看 Wind 数据状态
-3. 如果 Wind JSON 目录为空 → 先运行 FM_trade 的 Wind MCP 数据采集
+3. 如果 Wind JSON 目录为空 → 先运行 AgentAlpha 的 Wind MCP 数据采集
 4. 如果有 JSON 但 bin 为空 → 运行 python scripts/sync_data.py --force
 ```
 
@@ -645,7 +645,7 @@ cat data/output/alpha_signals.json | python -m json.tool | head -30
 | **指定日期** | 预测日期或回测区间，不指定则默认今天 |
 | **增量优先** | 数据同步默认增量，避免不必要的全量覆盖 |
 | **PIT 先行** | 任何新因子代码必须先通过 PIT 检测，再进入回测 |
-| **降级设计** | 信号工厂不可用时 FM_trade 自动降级，不阻塞管线 |
+| **降级设计** | 信号工厂不可用时 AgentAlpha 自动降级，不阻塞管线 |
 | **配置驱动** | 路径从 config/data.yaml 读取，支持环境变量覆盖 |
 
 ---

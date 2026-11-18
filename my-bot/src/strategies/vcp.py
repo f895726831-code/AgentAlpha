@@ -2,7 +2,7 @@
 VCP 收缩突破策略 — 波动收缩形态 (Volatility Contraction Pattern) 末端放量突破。
 
 参考实现:
-  - quant-signal-factory: vcp_breakout (3 阶段收缩 + 放量突破)
+  - signal-factory: vcp_breakout (3 阶段收缩 + 放量突破)
   - Mark Minervini VCP 理论: 振幅逐段收缩 → 供给耗尽 → 放量突破
 
 策略逻辑:

@@ -193,7 +193,7 @@ Remove-Item D:/AgentAlpha/signal-factory/data/output/oos_weight_state_csi300.jso
 ## 快速诊断命令集
 
 ```powershell
-# === FM_trade ===
+# === AgentAlpha ===
 # 当日 pipeline 是否完成
 cat D:\AgentAlpha\my-bot\logs\cron\signal-factory-pipeline.log | Select-String "complete"
 

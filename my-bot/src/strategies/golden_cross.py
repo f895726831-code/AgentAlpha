@@ -2,7 +2,7 @@
 T4 均线金叉策略 — 短期均线上穿长期均线, 成交量配合确认。
 
 参考实现:
-  - quant-signal-factory: golden_cross (MA20 上穿 MA60 + 放量)
+  - signal-factory: golden_cross (MA20 上穿 MA60 + 放量)
 
 策略逻辑:
   1. 前一日: MA_short ≤ MA_long (尚未金叉)

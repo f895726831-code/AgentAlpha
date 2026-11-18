@@ -3,7 +3,7 @@
   信号工厂每日盘前自动化
 .DESCRIPTION
   每天盘前（8:00）自动运行，为新一天交易提供 ML alpha 信号参考。
-  流程: 数据更新 -> 信号生成 -> 同步到 FM_trade
+  流程: 数据更新 -> 信号生成 -> 同步到 AgentAlpha
   日志: signal-factory/log/cron/YYYY-MM-DD-pipeline.log
 #>
 
@@ -120,9 +120,9 @@ if (Test-Path $AlphaOutput) {
 
 $FmSignals = "D:\AgentAlpha\my-bot\data\output\alpha_signals.json"
 if (Test-Path $FmSignals) {
-    Write-Log "OK: FM_trade sync complete"
+    Write-Log "OK: AgentAlpha sync complete"
 } else {
-    Write-Log "WARN: FM_trade sync file not found (sync step may have failed)"
+    Write-Log "WARN: AgentAlpha sync file not found (sync step may have failed)"
 }
 
 Write-Log "=== Signal Factory daily pipeline end ==="

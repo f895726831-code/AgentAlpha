@@ -37,7 +37,7 @@ if sys.platform == "win32":
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_OUTPUT = PROJECT_ROOT / "data" / "output"
-# HMM-Macro 分歧状态文件（由 quant-signal-factory 管线写入）
+# HMM-Macro 分歧状态文件（由 signal-factory 管线写入）
 HMM_DIVERGENCE_STATE = Path("D:/AgentAlpha/signal-factory/data/macro_assets/hmm_divergence_state.json")
 
 
@@ -425,7 +425,7 @@ class StableTiMiBridge:
         }
 
         # ── 构建 prompt ──
-        system_prompt = """你是 FM_trade v5.0 的策略编译 Agent。你基于 STABLE HMM 宏观判档、
+        system_prompt = """你是 AgentAlpha v5.0 的策略编译 Agent。你基于 STABLE HMM 宏观判档、
 TiMi 市场技术面数据、以及 El Niño ENSO 状态，输出当天应激活的策略组合和参数。
 
 ## 可用策略

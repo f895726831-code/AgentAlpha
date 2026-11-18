@@ -1,14 +1,14 @@
 """
-FM_trade Qlib 桥接层 — 薄封装，底层调用 quant-signal-factory
+AgentAlpha Qlib 桥接层 — 薄封装，底层调用 signal-factory
 
 所有功能从 D:\AgentAlpha\signal-factory\src\ 导入。
-此模块从 QSF 导入等价实现，保持 FM_trade API 兼容。
+此模块从 QSF 导入等价实现，保持 AgentAlpha API 兼容。
 
 版本: 0.2.0 → 桥接层 (底层: QSF)
 """
 
 __version__ = "0.2.0-bridge"
-__description__ = "FM_trade Qlib 桥接层 (底层: quant-signal-factory)"
+__description__ = "AgentAlpha Qlib 桥接层 (底层: signal-factory)"
 
 # 数据桥接
 from .data_bridge import (

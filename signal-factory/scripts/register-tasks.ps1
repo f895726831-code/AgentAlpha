@@ -66,7 +66,7 @@ Register-ScheduledTask `
     -Trigger $trigger2 `
     -Principal $principal `
     -Settings $settings `
-    -Description "信号工厂: 盘前 Alpha 信号生成 + 同步到 FM_trade (08:00)"
+    -Description "信号工厂: 盘前 Alpha 信号生成 + 同步到 AgentAlpha (08:00)"
 
 Write-Host "[OK] $task2Name — 每天 08:00"
 

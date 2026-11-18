@@ -128,7 +128,7 @@ echo.
 echo Weekly pipeline timing:
 echo   Mon 07:30  model retrain (CSI 500 + CSI 300, CatBoost/XGBoost/GBDT)
 echo   Sat 10:00  paper factor mining (DeepSeek) + RD-Agent factor mining
-echo   Mon 08:00  factor computation + combination + export to FM_trade
+echo   Mon 08:00  factor computation + combination + export to AgentAlpha
 echo.
 echo IMPORTANT: Open Task Scheduler (taskschd.msc), right-click each task,
 echo select Properties, check "Run whether user is logged on or not"

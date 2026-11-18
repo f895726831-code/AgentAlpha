@@ -2,7 +2,7 @@
 """
 fetch_sector_performance.py — 申万31行业实时表现与ML预测对比
 
-从 quant-signal-factory 缓存的 sector_*.csv 读取日线数据，
+从 signal-factory 缓存的 sector_*.csv 读取日线数据，
 计算每个行业的最新涨跌幅，与 sector_signals.json 的ML预测对比，
 输出 markdown 报告。
 

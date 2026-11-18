@@ -1,5 +1,5 @@
 """
-FM_trade 数据桥 — Passthrough to QSF src/data/wind_bridge.py（非独立 ETL）
+AgentAlpha 数据桥 — Passthrough to QSF src/data/wind_bridge.py（非独立 ETL）
 ═══════════════════════════════════════════════════════════════════════════
 
 此模块是 QSF WindBridge 的薄封装层，不实现独立 ETL 逻辑。
@@ -21,7 +21,7 @@ if str(_QSF_ROOT) not in sys.path:
 
 from src.data.wind_bridge import WindBridge, sync_wind_to_qlib, get_wind_data_summary
 
-# ─── 常量 (保持 FM_trade 兼容) ───
+# ─── 常量 (保持 AgentAlpha 兼容) ───
 
 WIND_COLUMN_MAP = {
     "TIME": "date",
@@ -138,7 +138,7 @@ def verify_qlib_data(bin_dir: str = None, region: str = "cn") -> bool:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="FM_trade × Qlib 数据桥 (QSF 桥接)")
+    parser = argparse.ArgumentParser(description="AgentAlpha × Qlib 数据桥 (QSF 桥接)")
     parser.add_argument("--mode", default="incremental", choices=["incremental", "full", "csv-only"],
                         help="同步模式")
     parser.add_argument("--input-dir", help="Wind JSON 输入目录")

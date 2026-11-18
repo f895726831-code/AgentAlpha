@@ -37,7 +37,7 @@ Register-ScheduledTask `
     -Trigger $trigger `
     -Principal $principal `
     -Settings $settings `
-    -Description "信号工厂: 每日盘前自动化流水线 — 数据更新 → Alpha信号生成 → 同步到FM_trade (08:00)"
+    -Description "信号工厂: 每日盘前自动化流水线 — 数据更新 → Alpha信号生成 → 同步到AgentAlpha (08:00)"
 
 Write-Host "=== 任务注册完成 ==="
 Write-Host "任务名称: $taskName"

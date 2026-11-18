@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""信号导出 — 生成 FM_trade JSON 契约"""
+"""信号导出 — 生成 AgentAlpha JSON 契约"""
 
 import argparse
 import json
@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def main():
-    parser = argparse.ArgumentParser(description="导出 FM_trade JSON 契约")
+    parser = argparse.ArgumentParser(description="导出 AgentAlpha JSON 契约")
     parser.add_argument("--date", default=None, help="日期 (YYYY-MM-DD)")
     parser.add_argument("--factors", default=None, help="因子结果 JSON 文件")
     parser.add_argument("--backtest", default=None, help="回测结果 JSON 文件")
@@ -23,7 +23,7 @@ def main():
     parser.add_argument("--latest", action="store_true", help="读取最新契约")
     args = parser.parse_args()
 
-    from src.export.fm_trade_bridge import generate_contract, save_contract, get_latest_contract, load_contract
+    from src.export.agent_alpha_bridge import generate_contract, save_contract, get_latest_contract, load_contract
 
     if args.latest:
         contract = get_latest_contract(args.output_dir)

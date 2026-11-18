@@ -9,12 +9,12 @@
   1.6 板块轮动信号生成（Layer 1，在 alpha 信号前独立运行）
   2. 论文因子挖掘（factor-lab API，可选）
   3. Alpha 信号生成（ensemble 多模型预测）
-  4. 同步到 FM_trade（JSON 桥接）
+  4. 同步到 AgentAlpha（JSON 桥接）
 
 用法:
     python scripts/daily_pipeline.py                    # 默认：更新数据 + 生成信号 + 同步
     python scripts/daily_pipeline.py --skip-update      # 跳过数据更新
-    python scripts/daily_pipeline.py --skip-sync        # 跳过 FM_trade 同步
+    python scripts/daily_pipeline.py --skip-sync        # 跳过 AgentAlpha 同步
     python scripts/daily_pipeline.py --paper-mining     # 启用论文因子挖掘
     python scripts/daily_pipeline.py --date 2026-08-14  # 指定日期
     python scripts/daily_pipeline.py --dry-run          # 仅检查，不执行
@@ -211,16 +211,16 @@ def step_increment_p1_factors(date: str, dry_run: bool = False) -> Dict:
 
 
 def step_sync_to_fm_trade(date: str, dry_run: bool = False) -> Dict:
-    """Step 3: 同步到 FM_trade"""
+    """Step 3: 同步到 AgentAlpha"""
     if not SYNC_SCRIPT.exists():
         print(f"  [WARN] 同步脚本不存在: {SYNC_SCRIPT}")
-        return {"step": "FM_trade 同步", "success": False, "exit_code": -1, "elapsed": 0, "stdout": "", "stderr": str(SYNC_SCRIPT) + " 不存在"}
+        return {"step": "AgentAlpha 同步", "success": False, "exit_code": -1, "elapsed": 0, "stdout": "", "stderr": str(SYNC_SCRIPT) + " 不存在"}
 
     cmd = [PYTHON_EXE, str(SYNC_SCRIPT)]
     if dry_run:
         print("  [DRY-RUN] 跳过同步")
-        return {"step": "FM_trade 同步", "success": True, "exit_code": 0, "elapsed": 0, "stdout": "(dry-run)", "stderr": ""}
-    return run_step("FM_trade 同步", cmd, timeout=60)
+        return {"step": "AgentAlpha 同步", "success": True, "exit_code": 0, "elapsed": 0, "stdout": "(dry-run)", "stderr": ""}
+    return run_step("AgentAlpha 同步", cmd, timeout=60)
 
 
 def step_factor_lab_papers(date: str, dry_run: bool = False, max_papers: int = 3) -> Dict:
@@ -472,7 +472,7 @@ def main():
     parser = argparse.ArgumentParser(description="信号工厂每日自动化流水线")
     parser.add_argument("--date", help="目标日期 (YYYY-MM-DD)，默认今天")
     parser.add_argument("--skip-update", action="store_true", help="跳过数据更新")
-    parser.add_argument("--skip-sync", action="store_true", help="跳过 FM_trade 同步")
+    parser.add_argument("--skip-sync", action="store_true", help="跳过 AgentAlpha 同步")
     parser.add_argument("--skip-infer", action="store_true", help="跳过纯推断信号生成")
     parser.add_argument("--skip-sector", action="store_true", help="跳过板块轮动信号生成")
     parser.add_argument("--dry-run", action="store_true", help="仅检查，不执行")
@@ -594,12 +594,12 @@ def main():
     else:
         healthcheck_p1_coverage()
 
-    # Step 4: 同步到 FM_trade
+    # Step 4: 同步到 AgentAlpha
     if not args.skip_sync:
         result = step_sync_to_fm_trade(date, dry_run=args.dry_run)
         steps.append(result)
     else:
-        print("\n[跳过] FM_trade 同步")
+        print("\n[跳过] AgentAlpha 同步")
 
     # 验证输出
     output = verify_output()

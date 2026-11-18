@@ -2,7 +2,7 @@
   "$schema": "./config.schema.json",
   "version": "0.1.0",
   "updated": "2026-08-06",
-  "description": "FM_trade × Qlib 整合层配置。所有参数通过此文件控制，不硬编码。",
+  "description": "AgentAlpha × Qlib 整合层配置。所有参数通过此文件控制，不硬编码。",
 
   "qlib": {
     "enabled": true,
@@ -38,7 +38,7 @@
 
     "alpha": {
       "enabled": false,
-      "comment": "Phase 2: Alpha 信号生成 — 已由 quant-signal-factory 接管（16:00 SignalFactory pipeline），此处禁用避免覆盖",
+      "comment": "Phase 2: Alpha 信号生成 — 已由 signal-factory 接管（16:00 SignalFactory pipeline），此处禁用避免覆盖",
       "default_model": "gbdt_alpha158",
       "models": {
         "gbdt_alpha158": {

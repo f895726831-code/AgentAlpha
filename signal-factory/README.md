@@ -1,86 +1,77 @@
-# Quant Signal Factory
+# Quant Signal Factory — AgentAlpha 信号工厂
 
-RD-Agent + Qlib 自动化量化信号工厂。每日盘后自动运行：数据同步 → 因子挖掘 → 回测验证 → 信号导出。
-
-22 个模块，5 层架构，零摩擦集成 FM_trade。
+每日盘后：**数据同步 → 因子/模型 → 回测验证 → JSON 契约 → AgentAlpha（my-bot）**。
 
 ## 架构
 
 ```
-Wind MCP 数据 → PIT 数据引擎 → RD-Agent 因子挖掘 → Qlib 回测 → JSON 契约 → FM_trade
+Wind MCP / akshare / baostock 数据
+   ↓
+PIT 数据引擎 + 泄漏检测 + OOS 门禁
+   ↓
+因子 / 模型（GBDT / XGBoost / CatBoost，Alpha158/360）
+   ↓
+Qlib 回测 + Gate 1 评分 + 执行现实性门禁
+   ↓
+JSON 契约（@contract / manifest / staleness）
+   ↓
+AgentAlpha（my-bot）消费
 ```
 
 ## 快速开始
 
 ```bash
-# 安装
-python -m venv venv
-venv\Scripts\activate
-pip install -e .
+cd signal-factory
+pip install -e ".[dev]"
 
-# 配置
-# 编辑 config/data.yaml — 设置数据路径
-# 编辑 config/rd_agent.yaml — 设置 DeepSeek API Key
+# 配置：config/data.yaml（数据路径）、config/model_*.yaml（模型参数）
 
-# 同步数据
-python scripts/sync_data.py
+# 1) 数据更新（akshare/baostock → Qlib bin）
+python scripts/update_daily.py --end 2026-01-01
 
-# 运行测试
-python -m pytest tests/test_leakage_checker.py -v
+# 2) 生成信号（跳过数据更新）
+python scripts/daily_pipeline.py --skip-update
 
-# 生成 Alpha 信号
-python -m src.factors.alpha_signals --ensemble --models gbdt xgboost
+# 3) 测试
+pytest tests -q      # 49 passed, 1 skipped
 ```
 
-## 项目结构
+## 目录
 
 ```
-quant-signal-factory/
-├── config/           # YAML 配置文件
-│   ├── data.yaml     # 数据源、Qlib 路径、PIT 配置
-│   └── rd_agent.yaml # RD-Agent + DeepSeek API 配置
-├── scripts/          # CLI 入口脚本
-│   └── sync_data.py  # Wind → Qlib 数据同步
-├── src/              # 核心代码
-│   ├── data/         # 数据层 (5 模块)
-│   │   ├── pit_handler.py       # PIT 数据引擎
-│   │   ├── leakage_checker.py   # AST 级泄漏检测
-│   │   ├── wind_bridge.py       # Wind MCP 数据桥
-│   │   ├── config_loader.py     # 统一配置加载
-│   │   └── qlib_init_helper.py  # Qlib mlflow 兼容
-│   ├── factors/      # 因子层 (6 模块)
-│   │   ├── rd_runner.py         # RD-Agent 因子挖掘
-│   │   ├── model_configs.py     # 5 模型配置 (GBDT/XGBoost/LSTM/TabNet)
-│   │   ├── alpha_signals.py     # ML Alpha 信号生成
-│   │   ├── validator.py         # 因子验证
-│   │   ├── combiner.py          # 因子合成
-│   │   └── store.py             # 因子持久化
-│   ├── backtest/     # 回测层 (3 模块)
-│   │   ├── adapter.py           # Qlib 回测适配
-│   │   ├── signal_generator.py  # 6 策略信号生成器
-│   │   └── gate_scorer.py       # Gate 1 评分
-│   └── export/       # 导出层 (2 模块)
-│       ├── export_signals.py    # 信号导出
-│       └── contract.py          # FM_trade JSON 契约
-├── tests/            # 测试 (20 tests)
-├── data/             # 数据目录
-│   └── output/       # 输出 (alpha_signals.json, models/)
-└── USAGE.md          # 详细使用指南
+signal-factory/
+├── src/
+│   ├── data/             # Wind/akshare 桥、PIT、泄漏检测、OOS 门禁、配置
+│   ├── factors/          # 模型配置、Alpha 信号、验证/假设/日志
+│   ├── backtest/         # Qlib 适配、信号生成、Gate1 评分、交叉验证、执行门禁
+│   ├── export/           # JSON 契约（agent_alpha_bridge）
+│   ├── sector_rotation/  # 板块轮动：数据/特征/模型/回测/契约
+│   ├── macro_allocation/ # 宏观大类资产：HMM/MVO/BL/回测
+│   └── utils/            # 通用工具
+├── scripts/              # 数据更新、每日管线、回测、宏观看板
+├── config/               # data.yaml / model_*.yaml / backtest.yaml
+└── tests/                # 4 个测试文件
 ```
 
-## 完整文档
+## 与 AgentAlpha（my-bot）的关系
 
-详见 **[USAGE.md](USAGE.md)** — 包含所有 22 个模块的 API 文档、CLI 用法、配置参考和 FM_trade 集成指南。
+信号工厂独立运行，通过 JSON 文件与 AgentAlpha 通信：
 
-## 与 FM_trade 的关系
+- 输出：`data/output/alpha_signals*.json`、`sector_signals.json`、`asset_allocation.json`
+- `my-bot/scripts/sync_signal_factory.py` 将 JSON 同步到 AgentAlpha 的 `data/output/`
+- AgentAlpha 读取 `alpha_signals.json` 获取 ML 排名；文件缺失或过期（`@contract.staleness`）时降级为纯 Agent 定性选股
 
-信号工厂独立运行，通过 JSON 文件与 FM_trade 通信。FM_trade 读取 `data/output/alpha_signals.json` 获取每日信号。信号工厂不可用时，FM_trade 自动降级到 Agent 定性选股。
+> 详细接口以源码 docstring 与 `src/export/agent_alpha_bridge.py` 为准；`USAGE.md` 为历史文档，可能滞后。
+
+## 数据说明
+
+- 本仓库**不附带**行情/财务数据；需自行准备 Qlib bin 数据（默认路径 `D:/qlib/qlib_data/cn_data`，可配置）。
+- 使用 Wind / Tushare 等商业数据源时，请遵守对应服务条款。
 
 ## 测试
 
 ```bash
-python -m pytest tests/ -v                            # 全部测试
-python -m pytest tests/test_leakage_checker.py -v     # 泄漏检测 (20 tests)
+pytest tests -q
 ```
 
 ## 许可证

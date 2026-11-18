@@ -200,14 +200,14 @@ def _parse_stocks_from_report(content: str) -> set:
 def load_benchmark_returns(start: str, end: str) -> pd.DataFrame:
     """
     Load benchmark return data for 11 assets.
-    Uses real ETF daily returns from quant-signal-factory/macro_assets.
+    Uses real ETF daily returns from signal-factory/macro_assets.
     Falls back to synthetic only if ETF data is unavailable.
     """
     returns = {}
 
     # ── Primary: load real ETF returns via AssetReturns ────────────────
     try:
-        # quant-signal-factory's AssetReturns loads 10 ETF CSVs + cash
+        # signal-factory's AssetReturns loads 10 ETF CSVs + cash
         qsf_data = Path("D:/AgentAlpha/signal-factory/data/macro_assets")
         if qsf_data.exists():
             import sys as _sys

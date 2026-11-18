@@ -7,7 +7,7 @@ Quant Signal Factory — 主流水线
   2. 因子挖掘（factor-lab API → RD-Agent + DeepSeek-V4）
   3. 策略回测（Qlib backtest）
   4. Gate 1 评分
-  5. 信号导出（FM_trade JSON 契约）
+  5. 信号导出（AgentAlpha JSON 契约）
 
 用法:
   python -m scripts.run_pipeline                # 完整流水线
@@ -374,11 +374,11 @@ def main():
 
     # ─── Stage 4: 信号导出 ───
     print("─" * 40)
-    print("[Stage 4/4] 信号导出 (FM_trade JSON 契约)")
+    print("[Stage 4/4] 信号导出 (AgentAlpha JSON 契约)")
     stage_start = time.time()
 
     try:
-        from src.export.fm_trade_bridge import generate_contract, save_contract
+        from src.export.agent_alpha_bridge import generate_contract, save_contract
 
         # 判断 PIT 状态
         pit_results = factor_results.get("pit_results", {})

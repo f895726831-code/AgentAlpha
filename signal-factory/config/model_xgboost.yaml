@@ -1,4 +1,4 @@
-# XGBoost 模型配置 — quant-signal-factory
+# XGBoost 模型配置 — signal-factory
 # 与 LightGBM baseline 相同的数据处理和回测配置，仅模型不同
 
 qlib_init:

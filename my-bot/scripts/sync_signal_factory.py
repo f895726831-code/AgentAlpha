@@ -1,8 +1,8 @@
 """
-FM_trade ← 信号工厂 JSON 桥接脚本
+AgentAlpha ← 信号工厂 JSON 桥接脚本
 
-从 quant-signal-factory 读取 alpha 信号和因子数据，
-复制到 FM_trade 的 data/output/ 目录供管线使用。
+从 signal-factory 读取 alpha 信号和因子数据，
+复制到 AgentAlpha 的 data/output/ 目录供管线使用。
 
 用法:
     python scripts/sync_signal_factory.py              # 同步最新信号
@@ -39,7 +39,7 @@ FM_TRADE_OUTPUT = FM_TRADE_DIR / "data/output"
 
 
 def sync_latest_signals(enrich_paper: bool = False) -> dict:
-    """同步最新的信号工厂数据到 FM_trade
+    """同步最新的信号工厂数据到 AgentAlpha
 
     Args:
         enrich_paper: 是否用论文因子增强 alpha 信号
@@ -279,7 +279,7 @@ def _build_summary(sync_result: dict) -> dict:
 
 
 def get_alpha_signals() -> Optional[dict]:
-    """读取 FM_trade 本地缓存的 alpha 信号（供管线使用）"""
+    """读取 AgentAlpha 本地缓存的 alpha 信号（供管线使用）"""
     path = FM_TRADE_OUTPUT / "alpha_signals.json"
     if not path.exists():
         return None
@@ -420,7 +420,7 @@ def sync_all_layers(enrich_paper: bool = False) -> dict:
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="FM_trade ← 信号工厂 JSON 桥接")
+    parser = argparse.ArgumentParser(description="AgentAlpha ← 信号工厂 JSON 桥接")
     parser.add_argument("--date", help="指定日期 (YYYY-MM-DD)")
     parser.add_argument("--watch", action="store_true", help="持续监控模式")
     parser.add_argument("--interval", type=int, default=300, help="监控间隔（秒）")

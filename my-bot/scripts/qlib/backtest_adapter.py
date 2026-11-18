@@ -1,7 +1,7 @@
 """
-FM_trade 回测适配器 — 桥接层 (底层: quant-signal-factory)
+AgentAlpha 回测适配器 — 桥接层 (底层: signal-factory)
 
-从 QSF src/backtest/adapter.py 导入，保持 FM_trade API 兼容。
+从 QSF src/backtest/adapter.py 导入，保持 AgentAlpha API 兼容。
 """
 
 import json
@@ -33,10 +33,10 @@ from src.backtest.adapter import (
 )
 
 
-# ─── FM_trade 兼容适配器 ───
+# ─── AgentAlpha 兼容适配器 ───
 
 def init_qlib_for_backtest(bin_dir: str = None) -> None:
-    """初始化 Qlib 环境用于回测（兼容 FM_trade 接口）"""
+    """初始化 Qlib 环境用于回测（兼容 AgentAlpha 接口）"""
     if bin_dir is None:
         bin_dir = "D:/qlib/qlib_data/cn_data"
     os.environ.setdefault("MLFLOW_ALLOW_FILE_STORE", "true")
@@ -56,7 +56,7 @@ def run_qlib_backtest(
     verbose: bool = False,
 ) -> dict:
     """
-    执行单标的 Qlib 回测（兼容 FM_trade 接口）。
+    执行单标的 Qlib 回测（兼容 AgentAlpha 接口）。
 
     委托给 QSF 的 run_backtest。先通过 QSF 生成信号，再执行回测。
     """

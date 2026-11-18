@@ -1,7 +1,7 @@
 """
-FM_trade 回测 CLI — 桥接层 (底层: quant-signal-factory)
+AgentAlpha 回测 CLI — 桥接层 (底层: signal-factory)
 
-从 QSF src/backtest/adapter.py 导入，保持 FM_trade CLI 兼容。
+从 QSF src/backtest/adapter.py 导入，保持 AgentAlpha CLI 兼容。
 调用方: cross_validate.py (line 461), evaluate_backtest.py (line 448)
 """
 

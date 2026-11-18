@@ -1,7 +1,7 @@
 """
-FM_trade Alpha 信号生成 — 桥接层 (底层: quant-signal-factory)
+AgentAlpha Alpha 信号生成 — 桥接层 (底层: signal-factory)
 
-从 QSF src/factors/alpha_signals.py 导入 AlphaSignalGenerator，保持 FM_trade API 兼容。
+从 QSF src/factors/alpha_signals.py 导入 AlphaSignalGenerator，保持 AgentAlpha API 兼容。
 """
 
 import json
@@ -23,14 +23,14 @@ if str(_QSF_ROOT) not in sys.path:
 # Fix MLflow
 os.environ.setdefault("MLFLOW_ALLOW_FILE_STORE", "true")
 
-# ─── 默认路径 (保持 FM_trade 兼容) ───
+# ─── 默认路径 (保持 AgentAlpha 兼容) ───
 
 DEFAULT_BIN_DIR = "D:/qlib/qlib_data/cn_data"
 DEFAULT_OUTPUT_FILE = "data/alpha_signals.json"
 DEFAULT_MODEL_DIR = "data/qlib_models"
 
 
-# ─── 配置加载 (保持 FM_trade 兼容) ───
+# ─── 配置加载 (保持 AgentAlpha 兼容) ───
 
 def load_config() -> dict:
     """加载 config.json (兼容接口)"""
@@ -164,7 +164,7 @@ def format_alpha_output(
     predict_date: str,
     top_n: int = 50,
 ) -> dict:
-    """格式化预测结果为 FM_trade 兼容的 JSON 结构"""
+    """格式化预测结果为 AgentAlpha 兼容的 JSON 结构"""
     scores = pred_df["score"].values if "score" in pred_df.columns else pred_df.iloc[:, -1].values
     instruments = pred_df.index.get_level_values("instrument").values if isinstance(pred_df.index, pd.MultiIndex) else pred_df.index.values
 
@@ -245,7 +245,7 @@ def run_alpha(
         force_retrain=force_train,
     )
 
-    # 转换为 FM_trade 兼容格式
+    # 转换为 AgentAlpha 兼容格式
     output = format_alpha_output(
         pred_df=result.get("predictions", pd.DataFrame()),
         model_name=model_name,
@@ -262,7 +262,7 @@ def run_alpha(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="FM_trade Alpha 信号生成 (QSF 桥接)")
+    parser = argparse.ArgumentParser(description="AgentAlpha Alpha 信号生成 (QSF 桥接)")
     parser.add_argument("--train", action="store_true", help="训练新模型")
     parser.add_argument("--predict", action="store_true", help="仅预测")
     parser.add_argument("--force", action="store_true", help="强制重新训练")

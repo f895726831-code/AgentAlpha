@@ -1,7 +1,7 @@
 """
-FM_trade Alpha 生成 CLI — 桥接层 (底层: quant-signal-factory)
+AgentAlpha Alpha 生成 CLI — 桥接层 (底层: signal-factory)
 
-从 QSF src/factors/alpha_signals.py 导入，保持 FM_trade CLI 兼容。
+从 QSF src/factors/alpha_signals.py 导入，保持 AgentAlpha CLI 兼容。
 调用方: run-daily-scan.ps1 (line 190)
 """
 
@@ -89,7 +89,7 @@ def show_status() -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="FM_trade Alpha 信号生成 (QSF 桥接)")
+    parser = argparse.ArgumentParser(description="AgentAlpha Alpha 信号生成 (QSF 桥接)")
     parser.add_argument("--train", action="store_true", help="训练新模型")
     parser.add_argument("--force", action="store_true", help="强制重新训练")
     parser.add_argument("--model", default="gbdt_alpha158", help="模型名称")

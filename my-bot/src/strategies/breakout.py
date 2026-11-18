@@ -2,7 +2,7 @@
 T1 突破策略 — 放量突破盘整区间后触价即入。
 
 参考实现:
-  - quant-signal-factory: breakout_60 (放量突破 60 元)
+  - signal-factory: breakout_60 (放量突破 60 元)
   - 记忆: [[entry-confirmation-must-filter-losses]] — 触价即入, 无需回踩确认
   - 记忆: [[smic-pullback-confirmation-false-positive]] — 确认条件反效果
 

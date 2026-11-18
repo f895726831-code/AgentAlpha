@@ -6,14 +6,14 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    quant-signal-factory (QSF)                │
+│                    signal-factory (QSF)                │
 │  数据采集 → 因子计算 → ML 训练 → 信号生成 → Gate 1 回测      │
 │  路径: D:\AgentAlpha\signal-factory                               │
 └──────────────┬────────────────────────────┬─────────────────┘
                │ sync_signal_factory.py     │ paper_factor
                ▼                            ▼
 ┌──────────────────────────────┐  ┌──────────────────────────┐
-│     FM_trade (my-bot)        │  │  factor-lab (WSL2:8700)  │
+│     AgentAlpha (my-bot)        │  │  factor-lab (WSL2:8700)  │
 │  信号筛选 → 追踪 → 风控      │  │  GFlowNet → Factory →    │
 │  Morning/Midday/Daily/Scan   │  │  FactorRegistry → Contract│
 │  路径: D:\AgentAlpha\my-bot    │  │  路径: D:\...\scripts\wsl2│
@@ -50,7 +50,7 @@ Step 2b:   CSI 300 ML Ensemble (alpha_signals_csi300.json)
 Step 2.5:  CSI 500 Infer-Only (alpha_signals_latest.json)
 Step 2.5b: CSI 300 Infer-Only (alpha_signals_latest_csi300.json)
 Step 2.6:  Phase 1 Factor Consensus (alpha_signals_p1.json, IC-weighted Z-score)
-Step 3:    Sync → FM_trade + Paper Factor Enrichment
+Step 3:    Sync → AgentAlpha + Paper Factor Enrichment
 Step 3.5:  VWAP Factor Merge (IC=0.356)
 Step 4:    Signal Watchlist 初始化
 Step 5:    Build Report Context (Layer 0/1 摘要)
@@ -105,11 +105,11 @@ Signal Output
   └─ alpha_signals_latest_csi300.json → CSI300 infer-only
 ```
 
-### 信号同步: QSF → FM_trade
+### 信号同步: QSF → AgentAlpha
 
 ```
 sync_signal_factory.py
-  ├─ 复制 JSON → FM_trade/data/output/
+  ├─ 复制 JSON → AgentAlpha/data/output/
   ├─ Staleness gate: excess_lag_days > 2 → 拒绝
   ├─ Paper factor enrichment (factor-lab API)
   └─ Manifest 更新 (data/output/manifest.json)
@@ -319,7 +319,7 @@ python scripts/generate_p1_signals.py \
 |------|------|
 | `scripts/wsl2/scripts/generate_p1_signals.py` | P1 共识信号生成 (W47 新增) |
 | `scripts/signal_tracker.py` | 信号追踪 (HOLD_DAYS 已更新) |
-| `data/output/alpha_signals_p1.json` | P1 信号输出 (FM_trade) |
+| `data/output/alpha_signals_p1.json` | P1 信号输出 (AgentAlpha) |
 | `data/sector-map.json` | 行业分类映射 (388 stocks, 29 sectors) |
 
 ```

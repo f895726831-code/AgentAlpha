@@ -2,7 +2,7 @@
 Layer 1 板块轮动信号生成器
 
 从 ML 模型生成最新板块信号，输出 sector_signals.json。
-供 FM_trade sync_signal_factory.py 的 sync_sector_signals() 消费。
+供 AgentAlpha sync_signal_factory.py 的 sync_sector_signals() 消费。
 
 用法:
     python scripts/generate_sector_signals.py               # 最新日期

@@ -42,7 +42,7 @@ export const SYSTEM_PROMPT = `你是 macro-allocator — 宏观大类资产配�
 
 ### 方式一：自动化管线（优先）
 
-调用 quant-signal-factory 的自动化 Python 管线：
+调用 signal-factory 的自动化 Python 管线：
 
 \`\`\`bash
 cd D:/AgentAlpha/signal-factory && python scripts/run_macro_allocation.py --mode risk_off

@@ -32,7 +32,7 @@
 1. 读取 `CLAUDE.md` 了解管线 **v4.3** 规则（三道关卡：Gate 1 回测关 / Gate 2 多空论战关 / Gate 3 风控关、模式判断、风控参数）
 2. 读取 `portfolio.json` 获取当前持仓和 watchlist
 3. 读取昨日报告 `reports/daily/YYYY-MM-DD-watchlist-scan.md`（YYYY-MM-DD 为昨日日期）获取前日收盘状态
-4. **★ML Alpha 信号**: 读取 `data/output/alpha_signals_latest.json`（优先，infer-only 无滞后）；若不存在或无效则 fallback 到 `data/output/alpha_signals.json`（由 quant-signal-factory 每日 cron 自动生成，有 5 日设计滞后）
+4. **★ML Alpha 信号**: 读取 `data/output/alpha_signals_latest.json`（优先，infer-only 无滞后）；若不存在或无效则 fallback 到 `data/output/alpha_signals.json`（由 signal-factory 每日 cron 自动生成，有 5 日设计滞后）
 4b. **★P1 因子共识信号 (v5.0)**: 读取 `data/output/alpha_signals_p1.json` 获取 Phase 1 37 因子 IC 加权共识排名。P1 与 ML 信号源**正交**（P1 偏好 sh6* 上海主板，ML 偏好 sz3* 创业板），重叠率约 5%。读取 `data/output/v4.3-vs-v5.0-comparison.json` 获取双轨对比数据（已到期信号数/胜率/超额收益等）。若 P1 文件不存在或 stale（excess_lag_days > 2），标注 `P1_UNAVAILABLE` 但不阻塞报告。
 4c. **★止损黑名单 (W46 #3)**: 读取 `data/blacklist.json` 获取止损黑名单。在自选股晨报中标注黑名单标的为"🚫 BLACKLISTED"，在盘前检查清单的计划中排除黑名单标的（不建仓）。黑名单由 signal_tracker 自动维护（5日亏损 > 15% 触发，有效期 30 天）。
 5. **★Layer 0 宏观配置**: 读取 `data/output/_layer0_summary.md` 获取预生成的宏观资产配置概览（由 `scripts/build_report_context.py` 生成）。若文件不存在，跳过并在报告中标注 Layer 0 数据待初始化。
@@ -97,7 +97,7 @@
 | 6 | **报告中的操作描述** | 使用"触发减仓条件"（条件满足但未执行）vs "已减仓"（closed 中有记录）。两者不可混淆。 |
 | 7 | **交叉验证** | 写入报告前，必须将报告中所有持仓数量与 `portfolio.json` 逐条对比。发现不一致 → 以 `portfolio.json` 为准修正。 |
 
-### ★ML Alpha 信号集成（quant-signal-factory）
+### ★ML Alpha 信号集成（signal-factory）
 
 > 信号工厂每日盘前自动运行 ensemble（CatBoost+XGBoost+GBDT）模型，产出全市场 alpha 排名。
 > 读取 data/output/alpha_signals.json 获取 ML 排名，与 Agent 定性选股取交集优先。

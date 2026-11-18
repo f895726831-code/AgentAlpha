@@ -208,7 +208,7 @@ class SectorAggregator:
 
     def _load_sector_map(self) -> Dict[str, str]:
         """加载个股→板块映射"""
-        # 尝试从 FM_trade 的 sector-map.json 加载
+        # 尝试从 AgentAlpha 的 sector-map.json 加载
         fm_trade_map = Path("D:/AgentAlpha/my-bot/data/sector-map.json")
         if fm_trade_map.exists():
             import json

@@ -127,10 +127,10 @@ def call_wind_mcp(windcodes: list[str], indexes: str = None) -> dict:
     with open(req_file, "w", encoding="utf-8") as f:
         json.dump({"windcode": ",".join(windcodes), "indexes": indexes}, f, ensure_ascii=False)
 
-    # 写入 bash 脚本到 FM_trade/data/ 目录
+    # 写入 bash 脚本到 AgentAlpha/data/ 目录
     sh_filename = f"_run_swt_{req_id}.sh"
     sh_file = FM_TRADE_DIR / "data" / sh_filename
-    unix_sh = f"/d/FM_trade/my-bot/data/{sh_filename}"
+    unix_sh = f"/d/AgentAlpha/my-bot/data/{sh_filename}"
     sh_content = (
         f"#!/bin/bash\n"
         f"cd /c/Users/%USERPROFILE%/.claude/skills/wind-mcp-skill\n"

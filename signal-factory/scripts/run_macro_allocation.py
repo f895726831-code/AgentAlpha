@@ -36,7 +36,7 @@ import pandas as pd
 QF_ROOT = Path("signal-factory")
 FM_TRADE_DATA = Path("D:/AgentAlpha/my-bot/data/output")
 
-# 确保 quant-signal-factory 在 sys.path
+# 确保 signal-factory 在 sys.path
 if str(QF_ROOT) not in sys.path:
     sys.path.insert(0, str(QF_ROOT))
 
@@ -779,7 +779,7 @@ def run_backtest(
         start_date: 回测起始日期
         end_date: 回测结束日期，默认昨天
         rebalance_freq: 调仓频率 (W-MON=周频, M=月频, Q=季频)
-        output_dir: 结果输出目录，默认 FM_trade data/output/
+        output_dir: 结果输出目录，默认 AgentAlpha data/output/
 
     Returns:
         exit code (0=success, 1=failure)

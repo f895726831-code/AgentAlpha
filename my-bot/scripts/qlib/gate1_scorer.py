@@ -1,7 +1,7 @@
 """
-FM_trade Gate 1 评分 — 桥接层 (底层: quant-signal-factory)
+AgentAlpha Gate 1 评分 — 桥接层 (底层: signal-factory)
 
-从 QSF src/backtest/scorer.py 导入 score_gate1，保持 FM_trade API 兼容。
+从 QSF src/backtest/scorer.py 导入 score_gate1，保持 AgentAlpha API 兼容。
 """
 
 import sys
@@ -18,7 +18,7 @@ from src.backtest.scorer import score_gate1 as _qsf_score_gate1
 
 def load_risk_policy(policy_path: Optional[str] = None) -> dict:
     """
-    加载风险策略配置（兼容 FM_trade 接口）。
+    加载风险策略配置（兼容 AgentAlpha 接口）。
     QSF 不使用 risk-policy.json，返回默认策略。
     """
     return {
@@ -51,7 +51,7 @@ def score_gate1(
     strategy_variants: int = 1,
 ) -> dict:
     """
-    Gate 1 评分（兼容 FM_trade 接口）。
+    Gate 1 评分（兼容 AgentAlpha 接口）。
 
     适配 QSF 的 score_gate1 函数，将 risk_policy 和 strategy_variants 映射到
     QSF 的参数格式。

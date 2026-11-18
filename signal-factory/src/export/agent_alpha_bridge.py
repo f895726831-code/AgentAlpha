@@ -1,7 +1,7 @@
 """
-FM_trade JSON 契约生成器
+AgentAlpha JSON 契约生成器
 
-将信号工厂的输出转换为 FM_trade 可读取的标准化 JSON 契约。
+将信号工厂的输出转换为 AgentAlpha 可读取的标准化 JSON 契约。
 这是两个项目之间的唯一耦合点。
 
 契约结构:
@@ -27,7 +27,7 @@ def generate_contract(
     data_coverage: Optional[dict] = None,
 ) -> dict:
     """
-    生成 FM_trade 可读的 JSON 契约。
+    生成 AgentAlpha 可读的 JSON 契约。
 
     参数:
         factor_results: RD-Agent 因子挖掘结果
@@ -36,7 +36,7 @@ def generate_contract(
         data_coverage: 数据覆盖信息
 
     返回:
-        FM_trade JSON 契约
+        AgentAlpha JSON 契约
     """
     contract = {
         "meta": _build_meta(factor_results, pit_verified, data_coverage),
@@ -55,7 +55,7 @@ def _build_meta(factor_results: dict, pit_verified: bool, data_coverage: Optiona
         "date": datetime.now().strftime("%Y-%m-%d"),
         "generated_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S+08:00"),
         "version": "1.0.0",
-        "engine": "quant-signal-factory",
+        "engine": "signal-factory",
         "pit_verified": pit_verified,
         "data_coverage": data_coverage or {},
         "factor_count": summary.get("ic_filtered", 0),
@@ -238,7 +238,7 @@ def save_contract(contract: dict, output_dir: str = "data/output/signals") -> Pa
 
 
 def load_contract(date_str: str, signal_dir: str = "data/output/signals") -> Optional[dict]:
-    """加载指定日期的契约（供 FM_trade 使用）"""
+    """加载指定日期的契约（供 AgentAlpha 使用）"""
     filepath = Path(signal_dir) / f"{date_str}.json"
     if not filepath.exists():
         return None

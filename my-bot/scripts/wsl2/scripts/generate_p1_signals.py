@@ -12,8 +12,8 @@ Usage:
     python scripts/generate_p1_signals.py --top-n 30         # top 30 output
 
 Output:
-    - quant-signal-factory/data/output/alpha_signals_p1.json
-    - FM_trade/my-bot/data/output/alpha_signals_p1.json
+    - signal-factory/data/output/alpha_signals_p1.json
+    - AgentAlpha/my-bot/data/output/alpha_signals_p1.json
 """
 
 import json
@@ -575,14 +575,14 @@ def main():
         print("\n[Dry-run] Signals not saved.")
         return 0
 
-    # Save to quant-signal-factory
+    # Save to signal-factory
     qsig_path = QSIG_OUTPUT / "alpha_signals_p1.json"
     QSIG_OUTPUT.mkdir(parents=True, exist_ok=True)
     with open(qsig_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
     print(f"\n[Save] {qsig_path}")
 
-    # Save to FM_trade
+    # Save to AgentAlpha
     fm_path = FM_TRADE_OUTPUT / "alpha_signals_p1.json"
     FM_TRADE_OUTPUT.mkdir(parents=True, exist_ok=True)
     with open(fm_path, "w", encoding="utf-8") as f:

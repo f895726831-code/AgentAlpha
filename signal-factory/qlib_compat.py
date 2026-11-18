@@ -1,7 +1,7 @@
 """
 Qlib API 兼容层 — 屏蔽 Qlib 0.8.x 与 0.9.7 之间的 API 差异
 
-quant-signal-factory 版本：从 src.data.config_loader 读取配置。
+signal-factory 版本：从 src.data.config_loader 读取配置。
 
 Qlib 0.9.7 的 API 变化：
   - D.instruments() 返回 dict 而非 list

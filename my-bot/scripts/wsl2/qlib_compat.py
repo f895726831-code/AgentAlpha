@@ -2,7 +2,7 @@
 Qlib API 兼容层 — WSL2 factor-lab 版本
 
 屏蔽 Qlib 0.9.x API 差异，使用 factor_lab_config 读取配置。
-与 quant-signal-factory/qlib_compat.py 保持接口兼容。
+与 signal-factory/qlib_compat.py 保持接口兼容。
 
 Qlib 0.9.7 关键差异:
   - D.instruments() 返回 dict 而非 list

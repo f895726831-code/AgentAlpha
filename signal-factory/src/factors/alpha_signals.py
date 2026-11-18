@@ -2,7 +2,7 @@
 Alpha 信号生成 — Qlib ML 模型训练 → 预测 → 排名 → 输出
 
 用 Qlib 的 ML 模型（GBDT、XGBoost 等）训练 alpha 信号，产出每日股票排名，
-输入到 FM_trade Stage 1（选股）阶段。
+输入到 AgentAlpha Stage 1（选股）阶段。
 
 核心流程:
   1. 初始化 Qlib 环境
@@ -969,7 +969,7 @@ class AlphaSignalGenerator:
             "schema_version": "1.0.0",
             "generated_at": now.strftime("%Y-%m-%dT%H:%M:%S"),
             "as_of_date": date,
-            "source": "quant-signal-factory/src/factors/alpha_signals.py",
+            "source": "signal-factory/src/factors/alpha_signals.py",
             "universe": universe,
             "horizon": "5d",
             "model": model_name,

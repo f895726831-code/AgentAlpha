@@ -106,7 +106,7 @@ def check_anomalies(manifest, signals):
 
 def main():
     print("=" * 66)
-    print("  FM_trade Pipeline Summary —", datetime.now(TZ_CST).strftime("%Y-%m-%d %H:%M CST"))
+    print("  AgentAlpha Pipeline Summary —", datetime.now(TZ_CST).strftime("%Y-%m-%d %H:%M CST"))
     print("=" * 66)
 
     manifest = load_manifest()

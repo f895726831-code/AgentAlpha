@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # sector_contract.py — 板块信号 JSON 契约
 #
-# 定义 Layer 1（板块轮动）与 FM_trade 之间的数据契约。
+# 定义 Layer 1（板块轮动）与 AgentAlpha 之间的数据契约。
 # 输出格式：sector_signals.json
 #
 # 契约版本：1.0

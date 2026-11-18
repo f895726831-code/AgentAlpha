@@ -1,7 +1,7 @@
 """
-FM_trade 数据同步 CLI — 桥接层 (底层: quant-signal-factory)
+AgentAlpha 数据同步 CLI — 桥接层 (底层: signal-factory)
 
-从 QSF src/data/wind_bridge.py 导入，保持 FM_trade CLI 兼容。
+从 QSF src/data/wind_bridge.py 导入，保持 AgentAlpha CLI 兼容。
 调用方: run-daily-scan.ps1 (line 156)
 """
 
@@ -19,7 +19,7 @@ if str(_QSF_ROOT) not in sys.path:
 
 
 def load_config() -> dict:
-    """加载配置（兼容 FM_trade 接口）"""
+    """加载配置（兼容 AgentAlpha 接口）"""
     from src.data.config_loader import get_config
     return get_config()
 
@@ -86,7 +86,7 @@ def show_status() -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="FM_trade 数据同步 (QSF 桥接)")
+    parser = argparse.ArgumentParser(description="AgentAlpha 数据同步 (QSF 桥接)")
     parser.add_argument("--force", action="store_true", help="强制全量同步")
     parser.add_argument("--no-dump", action="store_true", help="仅转换 CSV，不 dump bin")
     parser.add_argument("--status", action="store_true", help="显示数据状态")

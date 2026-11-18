@@ -2,7 +2,7 @@
 T3 超跌反弹策略 — RSI 超卖后缩量止跌反弹。
 
 参考实现:
-  - quant-signal-factory: oversold_bounce (RSI<30 + 缩量 + 止跌阳线)
+  - signal-factory: oversold_bounce (RSI<30 + 缩量 + 止跌阳线)
   - risk-policy.json: left_priority 下 T3 权重 1.0, right_priority 下禁用
 
 策略逻辑:

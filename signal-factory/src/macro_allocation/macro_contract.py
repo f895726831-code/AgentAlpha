@@ -1,7 +1,7 @@
 """macro_contract.py — Layer 0 资产配置 JSON 契约定义与校验
 
 定义 asset_allocation.json 的完整 schema，提供 validate/serialize/deserialize。
-被 FM_trade 的 build_report_context.py 和 quant-signal-factory 管线消费。
+被 AgentAlpha 的 build_report_context.py 和 signal-factory 管线消费。
 
 Contract version: 1.0.0
 """

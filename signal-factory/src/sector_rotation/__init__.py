@@ -10,7 +10,7 @@
 #   sector_model      — SectorModelGenerator，训练/预测/集成
 #   sector_aggregator — B 方案基准线：个股 alpha 聚合到板块
 #   sector_backtest   — IC 分析，做多 Top-5 模拟，滚动窗口
-#   sector_contract   — FM_trade 板块信号 JSON 契约
+#   sector_contract   — AgentAlpha 板块信号 JSON 契约
 
 from src.sector_rotation.sector_data import (
     SectorDataCollector,

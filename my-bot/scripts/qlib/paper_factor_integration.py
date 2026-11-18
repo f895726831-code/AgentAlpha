@@ -16,14 +16,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-# 确保 quant-signal-factory 在 sys.path 中
+# 确保 signal-factory 在 sys.path 中
 _QSF_ROOT = Path("signal-factory")
 if str(_QSF_ROOT) not in sys.path:
     sys.path.insert(0, str(_QSF_ROOT))
 
 from src.factor_lab_client import FactorLabClient
 
-# FM_trade 路径
+# AgentAlpha 路径
 FM_TRADE_DIR = Path(__file__).resolve().parent.parent.parent
 FM_TRADE_OUTPUT = FM_TRADE_DIR / "data" / "output"
 
@@ -226,7 +226,7 @@ class PaperFactorIntegrator:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="论文因子集成 — factor-lab → FM_trade")
+    parser = argparse.ArgumentParser(description="论文因子集成 — factor-lab → AgentAlpha")
     parser.add_argument("--date", help="目标日期 (YYYY-MM-DD)，默认今天")
     parser.add_argument("--alpha-file", help="alpha_signals.json 路径")
     parser.add_argument("--output", help="输出文件路径")

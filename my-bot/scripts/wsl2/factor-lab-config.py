@@ -1,7 +1,7 @@
 """
 factor-lab 配置模块 — WSL2 原生环境
 
-通过环境变量覆盖默认路径，与 quant-signal-factory 的 config_loader.py 保持接口兼容。
+通过环境变量覆盖默认路径，与 signal-factory 的 config_loader.py 保持接口兼容。
 
 用法:
     from config import get_qlib_bin_dir, get_qlib_region, get_qlib_csv_dir

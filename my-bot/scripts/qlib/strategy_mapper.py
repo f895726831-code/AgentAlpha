@@ -1,5 +1,5 @@
 """
-FM_trade 策略映射器 — 桥接层 (底层: quant-signal-factory)
+AgentAlpha 策略映射器 — 桥接层 (底层: signal-factory)
 
 从 QSF src/backtest/signal_generator.py 和 src/backtest/adapter.py 导入。
 """
@@ -38,7 +38,7 @@ from src.backtest.adapter import (
 )
 
 
-# ─── FM_trade 兼容适配器 ───
+# ─── AgentAlpha 兼容适配器 ───
 
 def get_qlib_signal_from_rules(
     symbol: str,
@@ -48,7 +48,7 @@ def get_qlib_signal_from_rules(
     override_params: Optional[dict] = None,
 ) -> pd.Series:
     """
-    从 Qlib 数据加载价格并使用 FM_trade 规则生成信号。
+    从 Qlib 数据加载价格并使用 AgentAlpha 规则生成信号。
     委托给 QSF 的 get_signal_from_qlib。
     """
     return get_signal_from_qlib(
@@ -69,7 +69,7 @@ def map_strategy_to_qlib(
     exchange_kwargs: Optional[dict] = None,
 ) -> dict:
     """
-    将 FM_trade 策略映射为 Qlib backtest 完整配置。
+    将 AgentAlpha 策略映射为 Qlib backtest 完整配置。
     委托给 QSF 的 map_strategy_to_qlib_config。
     """
     strategy_info = get_strategy_info(strategy_name)
@@ -96,7 +96,7 @@ def map_strategy_to_qlib(
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="FM_trade → Qlib 策略映射器 (QSF 桥接)")
+    parser = argparse.ArgumentParser(description="AgentAlpha → Qlib 策略映射器 (QSF 桥接)")
     parser.add_argument("--list", action="store_true", help="列出所有可用策略")
     parser.add_argument("--strategy", help="策略名称")
     parser.add_argument("--symbol", help="标的代码 (如 sh600519)")

@@ -2,7 +2,7 @@
 T2 回调低吸策略 — 上升趋势中回调至均线支撑位后缩量企稳入场。
 
 参考实现:
-  - quant-signal-factory: pullback_low (回调至 MA20 + 缩量确认)
+  - signal-factory: pullback_low (回调至 MA20 + 缩量确认)
   - risk-policy.json: left_priority 下 T2×1.5, right_priority 下 T2×0.5
 
 策略逻辑:

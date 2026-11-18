@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Run quant-signal-factory daily pipeline + sync to FM_trade
+  Run signal-factory daily pipeline + sync to AgentAlpha
 .DESCRIPTION
   Triggered by Windows Task Scheduler at 08:05 on trading days.
   Steps (dependency chain enforced):
@@ -16,7 +16,7 @@
     2.5b: CSI 300 Infer-Only
     2.55: P1 Factor Incremental Update (v5.0)
     2.6: P1 Factor Consensus (v5.0 FactorFactory Bridge)
-    3:   Sync to FM_trade
+    3:   Sync to AgentAlpha
     3.5: VWAP Factor Merge
     4:   Signal Watchlist Init
     5:   Build Report Context (Layer 0/1)
@@ -335,11 +335,11 @@ if ($p1Exit -eq 0) {
     $script:SignalsOk = (-not $script:Csi500Failed)  # true unless CSI 500 failed
 }  # end if DataOk (signal generation guard)
 
-# ─── Step 3: Sync to FM_trade ───
+# ─── Step 3: Sync to AgentAlpha ───
 if ($script:DataOk -eq $false) {
-    Write-Log "Step 3: Sync to FM_trade — SKIPPED (data update failed)"
+    Write-Log "Step 3: Sync to AgentAlpha — SKIPPED (data update failed)"
 } else {
-    Write-Log "Step 3: Sync to FM_trade"
+    Write-Log "Step 3: Sync to AgentAlpha"
     $StartTime = Get-Date
     Set-Location D:/AgentAlpha/my-bot
 

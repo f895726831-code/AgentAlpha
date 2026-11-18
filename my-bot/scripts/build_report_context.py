@@ -306,7 +306,7 @@ def build_layer1_summary() -> str:
     生成 Layer 1 板块轮动概览 markdown。
     数据源: sector_signals.json + 可选 _sector_performance.md
     """
-    # 优先读 FM_trade 本地副本，回退到 quant-signal-factory
+    # 优先读 AgentAlpha 本地副本，回退到 signal-factory
     sector_data = load_json(DATA_DIR / "sector_signals.json")
     if sector_data is None:
         sector_data = load_json(QF_DATA_DIR / "sector_signals.json")

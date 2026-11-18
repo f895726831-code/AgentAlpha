@@ -1,11 +1,11 @@
 ---
 name: market-wide-scanner
-description: 全市场初筛 — 利用 Wind search_stocks 从全市场海选标的，通过条件筛选→快速过滤→五维快扫评分，输出 Top 20 候选进入管线深度分析。Pipeline v4.3 Stage 0 核心技能。
+description: 全市场初筛 — 利用 Wind search_stocks 从全市场海选标的，通过条件筛选→快速过滤→五维快扫评分，输出 Top 20 候选进入管线深度分析。Pipeline v5.0 Stage 0 核心技能。
 ---
 
 # 全市场初筛 (Market-Wide Scanner)
 
-Pipeline v4.3 Stage 0 — 在现有选股链之前，从全市场海选标的，弥补自选池的局限。
+Pipeline v5.0 Stage 0 — 在现有选股链之前，从全市场海选标的，弥补自选池的局限。
 
 ## 核心理念
 
