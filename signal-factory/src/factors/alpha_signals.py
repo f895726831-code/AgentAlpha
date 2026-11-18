@@ -222,11 +222,11 @@ class AlphaSignalGenerator:
                 status: str,
             }
         """
-        self._init_qlib()
-
         cfg = get_model_config(model_name)
         if cfg is None:
             return {"error": f"未知模型: {model_name}", "available": list_models()}
+
+        self._init_qlib()
 
         # 模型保存路径（标的特定）
         model_path = self._model_path(cfg, instruments)
