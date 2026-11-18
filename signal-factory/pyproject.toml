@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentalpha-signal-factory"
+version = "0.1.0"
+description = "RD-Agent + Qlib 自动化信号工厂，与 AgentAlpha 通过 JSON 契约松耦合"
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "pyyaml>=6.0",
+    "openai>=1.0",           # DeepSeek API (OpenAI-compatible)
+    "lightgbm>=4.0",
+    "scipy>=1.10",
+    "pydantic>=2.0",
+    "loguru>=0.7",
+]
+
+# Qlib 和 RD-Agent 需要单独安装:
+#   pip install qlib
+#   pip install rd-agent  (或从 GitHub: pip install git+https://github.com/microsoft/RD-Agent.git)
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black",
+    "ruff",
+]
+# 数据源（akshare/baostock）与宏观/板块 ML 依赖
+data = [
+    "akshare>=1.12",
+    "baostock>=0.8",
+]
+ml = [
+    "scikit-learn>=1.3",
+    "hmmlearn>=0.3",
+    "catboost>=1.2",
+    "xgboost>=2.0",
+    "joblib>=1.3",
+]
+
+[project.scripts]
+signal-factory = "scripts.run_pipeline:main"
+signal-factory-sync = "scripts.sync_data:main"
+signal-factory-mine = "scripts.run_factor_mining:main"
+signal-factory-export = "scripts.export_signals:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

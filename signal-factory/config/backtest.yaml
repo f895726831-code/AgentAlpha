@@ -1,0 +1,59 @@
+# 回测配置
+backtest:
+  # 回测引擎
+  engine: "qlib"
+
+  # 默认回测参数
+  default:
+    account: 1000000      # 初始资金 100 万
+    benchmark: null       # 不使用基准（避免 Qlib 默认 SH000300 bug）
+    start_time: "2020-01-01"
+    end_time: "auto"      # 自动使用最新数据日期
+
+  # 交易所模拟
+  exchange:
+    freq: "day"
+    deal_price: "close"   # 收盘价成交
+    open_cost: 0.00025    # 买入佣金 0.025% (万2.5)
+    close_cost: 0.00075   # 卖出佣金 0.025% + 印花税 0.05% = 0.075%
+    min_cost: 5           # 最低佣金 5 元
+    limit_threshold: 0.1  # 涨跌停限制 10%
+
+  # 反过拟合
+  anti_overfitting:
+    # Layer 1: 样本外验证
+    oos_ratio: 0.3
+    max_oos_decay: 15     # 样本外衰减 ≤ 15 分
+    min_trades_for_oos: 15
+
+    # Layer 2: 复杂度惩罚
+    complexity_penalty:
+      low: -5     # 1-3 参数
+      medium: -10 # 4-6 参数
+      high: -15   # 7+ 参数
+
+    # Layer 3: Walk-forward 验证
+    walk_forward:
+      enabled: true
+      windows: 2
+      min_data_years: 3  # 需要 ≥3 年数据
+
+  # Gate 1 评分维度
+  gate1:
+    dimensions:
+      sample_size: 0.20
+      expectancy: 0.25
+      risk_control: 0.25
+      robustness: 0.20
+      execution_feasibility: 0.10
+
+    thresholds:
+      deploy: 70    # ≥70 分 → Deploy
+      refine: 40    # 40-69 分 → Refine
+      abandon: 40   # <40 分 → Abandon
+
+  # 输出
+  output:
+    dir: "data/output/backtests"
+    save_gate1_scorecard: true
+    save_portfolio_metrics: true

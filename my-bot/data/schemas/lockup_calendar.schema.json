@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lockup Expiry Calendar",
+  "description": "未来 90 天 A 股限售股解禁事件日历。数据源：a-stock-data §4 get_lockup_expiry()。周度刷新（每周六 Evolution-Scan 批次）。",
+  "type": "object",
+  "required": ["generated", "lookahead_days", "alerts"],
+  "properties": {
+    "generated": {
+      "type": "string",
+      "format": "date",
+      "description": "日历生成日期"
+    },
+    "lookahead_days": {
+      "type": "integer",
+      "minimum": 30,
+      "maximum": 180,
+      "description": "前瞻天数（默认 90）"
+    },
+    "data_source": {
+      "type": "string",
+      "description": "数据来源标识",
+      "default": "a-stock-data get_lockup_expiry()"
+    },
+    "alerts": {
+      "type": "array",
+      "description": "解禁事件列表，按 unlock_date 升序排列",
+      "items": {
+        "type": "object",
+        "required": ["symbol", "name", "unlock_date", "unlock_shares_pct"],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "description": "股票代码（6位数字）"
+          },
+          "name": {
+            "type": "string",
+            "description": "股票简称"
+          },
+          "unlock_date": {
+            "type": "string",
+            "format": "date",
+            "description": "解禁日期"
+          },
+          "unlock_shares_pct": {
+            "type": "number",
+            "minimum": 0,
+            "description": "解禁股数占流通盘百分比（%）"
+          },
+          "unlock_shares_wan": {
+            "type": "number",
+            "description": "解禁股数（万股）"
+          },
+          "unlock_type": {
+            "type": "string",
+            "enum": ["ipo_lockup", "private_placement", "esop", "restricted_stock", "other"],
+            "description": "解禁类型：IPO限售 / 定增 / 股权激励 / 股改限售 / 其他"
+          },
+          "in_portfolio": {
+            "type": "boolean",
+            "default": false,
+            "description": "是否在当前持仓中"
+          },
+          "in_watchlist": {
+            "type": "boolean",
+            "default": false,
+            "description": "是否在自选池中"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": ["high", "medium", "low"],
+            "description": "对持仓/自选池的风险等级。high: 解禁 > 10% 流通盘 + 在持仓中; medium: 解禁 5-10% + 在持仓/自选; low: 其他"
+          },
+          "days_until_unlock": {
+            "type": "integer",
+            "description": "距解禁天数"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "汇总统计",
+      "properties": {
+        "total_events": {
+          "type": "integer",
+          "description": "未来 90 天总解禁事件数"
+        },
+        "portfolio_impacted": {
+          "type": "integer",
+          "description": "影响持仓的件数"
+        },
+        "watchlist_impacted": {
+          "type": "integer",
+          "description": "影响自选池的件数"
+        },
+        "high_risk_count": {
+          "type": "integer",
+          "description": "高风险事件数"
+        }
+      }
+    }
+  }
+}

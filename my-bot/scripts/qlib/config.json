@@ -1,0 +1,119 @@
+{
+  "$schema": "./config.schema.json",
+  "version": "0.1.0",
+  "updated": "2026-08-06",
+  "description": "FM_trade × Qlib 整合层配置。所有参数通过此文件控制，不硬编码。",
+
+  "qlib": {
+    "enabled": true,
+    "comment": "设置为 false 可完全禁用 Qlib 整合层，管线回退到纯 Agent 模式",
+
+    "paths": {
+      "qlib_root": "D:/qlib",
+      "python_path": "D:/qlib/venv/Scripts/python.exe",
+      "venv_path": "D:/qlib/venv"
+    },
+
+    "data": {
+      "csv_dir": "D:/qlib/qlib_data/source/cn_1d",
+      "bin_dir": "D:/qlib/qlib_data/cn_data",
+      "freq": "day",
+      "region": "cn",
+      "symbols": "auto",
+      "comment_symbols": "\"auto\" = 自动从 Wind JSON 发现所有标的; 也可指定列表如 [\"sh600519\", \"sz000858\"]"
+    },
+
+    "sync": {
+      "schedule": "daily_after_close",
+      "mode": "incremental",
+      "auto_dump_bin": true,
+      "retention_days": 365,
+      "comment_retention": "CSV 数据保留天数，超过的自动归档",
+      "input_dirs": [
+        "~/AppData/Local/Temp",
+        "~/.claude/projects/d--FM-trade"
+      ],
+      "file_patterns": ["wind_*.json", "*_kline*.json"]
+    },
+
+    "alpha": {
+      "enabled": false,
+      "comment": "Phase 2: Alpha 信号生成 — 已由 quant-signal-factory 接管（16:00 SignalFactory pipeline），此处禁用避免覆盖",
+      "default_model": "gbdt_alpha158",
+      "models": {
+        "gbdt_alpha158": {
+          "class": "LGBModel",
+          "module_path": "qlib.contrib.model.gbdt",
+          "handler": "Alpha158",
+          "train_frequency": "weekly",
+          "kwargs": {
+            "loss": "mse",
+            "learning_rate": 0.1,
+            "max_depth": 8,
+            "num_leaves": 210,
+            "n_estimators": 500,
+            "early_stopping_rounds": 50
+          }
+        },
+        "xgboost_alpha158": {
+          "class": "XGBModel",
+          "module_path": "qlib.contrib.model.xgboost",
+          "handler": "Alpha158",
+          "train_frequency": "weekly",
+          "kwargs": {
+            "max_depth": 6,
+            "learning_rate": 0.1,
+            "n_estimators": 500
+          }
+        }
+      },
+      "dataset": {
+        "handler": "Alpha158",
+        "segments": {
+          "train": ["2018-01-01", "2025-12-31"],
+          "valid": ["2026-01-01", "2026-06-30"],
+          "test": ["2026-07-01", "2026-12-31"]
+        },
+        "instruments": "all"
+      },
+      "output": {
+        "top_n": 50,
+        "output_file": "data/alpha_signals.json"
+      }
+    },
+
+    "backtest": {
+      "enabled": true,
+      "comment": "Phase 3: Qlib 回测引擎 (已部署) — 替代手工回测脚本，提供专业级回测+Gate 1 评分",
+      "engine": "qlib",
+      "fallback": "manual",
+      "default_config": {
+        "account": 1000000,
+        "benchmark": "sh000300",
+        "exchange": {
+          "freq": "day",
+          "deal_price": "close",
+          "open_cost": 0.0003,
+          "close_cost": 0.0013,
+          "min_cost": 5,
+          "limit_threshold": 0.1
+        }
+      },
+      "anti_overfitting": {
+        "oos_ratio": 0.3,
+        "min_trades_for_oos": 15,
+        "walk_forward_windows": 2
+      },
+      "output": {
+        "dir": "data/backtest_results",
+        "save_gate1_scorecard": true
+      }
+    },
+
+    "logging": {
+      "level": "INFO",
+      "log_dir": "logs/qlib",
+      "max_log_files": 30
+    }
+  }
+}

@@ -1,0 +1,294 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-11-11",
+  "source": "D:\\AgentAlpha\\my-bot\\scripts\\wsl2\\data\\factor_registry.json",
+  "total_seeds": 25,
+  "field_coverage": [
+    "close",
+    "low",
+    "open",
+    "returns",
+    "volume"
+  ],
+  "operator_coverage": [
+    "",
+    "Abs",
+    "Delay",
+    "If",
+    "Log",
+    "Max",
+    "Min",
+    "Quantile",
+    "Rank",
+    "Scale",
+    "SignedPower",
+    "Ts_Max",
+    "Ts_Mean",
+    "Ts_Std"
+  ],
+  "field_op_combos": 24,
+  "seeds": [
+    {
+      "formula": "SignedPower($returns, 20)",
+      "ic_mean": 0.09778,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "SignedPower"
+      ]
+    },
+    {
+      "formula": "SignedPower($returns, 2)",
+      "ic_mean": 0.060824,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "SignedPower"
+      ]
+    },
+    {
+      "formula": "(30 / $volume)",
+      "ic_mean": 0.060642,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        ""
+      ]
+    },
+    {
+      "formula": "Log($volume)",
+      "ic_mean": 0.038938,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Log"
+      ]
+    },
+    {
+      "formula": "Abs(Log($volume))",
+      "ic_mean": 0.038938,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Abs",
+        "Log"
+      ]
+    },
+    {
+      "formula": "Abs($returns)",
+      "ic_mean": 0.033027,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "Abs"
+      ]
+    },
+    {
+      "formula": "SignedPower($open, 20)",
+      "ic_mean": 0.032705,
+      "fields": [
+        "open"
+      ],
+      "operators": [
+        "SignedPower"
+      ]
+    },
+    {
+      "formula": "Quantile($volume, 120)",
+      "ic_mean": 0.031489,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Quantile"
+      ]
+    },
+    {
+      "formula": "Rank(Log($volume))",
+      "ic_mean": 0.031469,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Log",
+        "Rank"
+      ]
+    },
+    {
+      "formula": "Rank($volume)",
+      "ic_mean": 0.031469,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Rank"
+      ]
+    },
+    {
+      "formula": "Rank(Rank($volume))",
+      "ic_mean": 0.031469,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Rank"
+      ]
+    },
+    {
+      "formula": "Quantile(Log($volume), 10)",
+      "ic_mean": 0.03099,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Log",
+        "Quantile"
+      ]
+    },
+    {
+      "formula": "Scale($returns)",
+      "ic_mean": 0.027083,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "Scale"
+      ]
+    },
+    {
+      "formula": "(5 * (250 + $returns))",
+      "ic_mean": 0.027083,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        ""
+      ]
+    },
+    {
+      "formula": "Scale(Min(250, $returns))",
+      "ic_mean": 0.027083,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "Min",
+        "Scale"
+      ]
+    },
+    {
+      "formula": "Ts_Mean($returns, 5)",
+      "ic_mean": 0.025454,
+      "fields": [
+        "returns"
+      ],
+      "operators": [
+        "Ts_Mean"
+      ]
+    },
+    {
+      "formula": "Scale($volume)",
+      "ic_mean": 0.025153,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Scale"
+      ]
+    },
+    {
+      "formula": "Max($volume, 250)",
+      "ic_mean": 0.025153,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Max"
+      ]
+    },
+    {
+      "formula": "Max($low, $volume)",
+      "ic_mean": 0.025153,
+      "fields": [
+        "low",
+        "volume"
+      ],
+      "operators": [
+        "Max"
+      ]
+    },
+    {
+      "formula": "If($returns, $volume, Scale(250))",
+      "ic_mean": 0.023386,
+      "fields": [
+        "returns",
+        "volume"
+      ],
+      "operators": [
+        "If",
+        "Scale"
+      ]
+    },
+    {
+      "formula": "(Abs($volume) / $low)",
+      "ic_mean": 0.020694,
+      "fields": [
+        "low",
+        "volume"
+      ],
+      "operators": [
+        "",
+        "Abs"
+      ]
+    },
+    {
+      "formula": "(($volume - $open) / (5 * $close))",
+      "ic_mean": 0.020571,
+      "fields": [
+        "close",
+        "open",
+        "volume"
+      ],
+      "operators": [
+        ""
+      ]
+    },
+    {
+      "formula": "($close - Delay($close, 5)) / Delay($close, 5)",
+      "ic_mean": 0.016969,
+      "fields": [
+        "close"
+      ],
+      "operators": [
+        "",
+        "Delay"
+      ]
+    },
+    {
+      "formula": "Ts_Max($volume, 30)",
+      "ic_mean": 0.016861,
+      "fields": [
+        "volume"
+      ],
+      "operators": [
+        "Ts_Max"
+      ]
+    },
+    {
+      "formula": "Ts_Std($close, 5)",
+      "ic_mean": 0.016305,
+      "fields": [
+        "close"
+      ],
+      "operators": [
+        "Ts_Std"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Python dependencies for my-bot scripts
+# Install: pip install -r requirements.txt
+
+# backtest.py — 双均线交叉策略回测
+# Uses only stdlib (json, sys, datetime) — no extra deps needed
+
+# classify_watchlist.py — 雪球自选股行业分类
+# Uses only stdlib (json, re, collections) — no extra deps needed
+
+# No external dependencies required. All Python scripts use stdlib only.

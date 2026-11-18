@@ -1,0 +1,51 @@
+{
+  "name": "my-bot",
+  "version": "0.3.0",
+  "description": "My AI agent harness — 趋势交易量化决策系统，三模式自适应管线 v4.0",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "my-bot": "bin/cli.js"
+  },
+  "files": [
+    "bin/**",
+    "dist/**",
+    "src/**",
+    "tsconfig.json",
+    ".claude/**",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "init": "node ./bin/cli.js init",
+    "doctor": "node ./bin/cli.js doctor",
+    "evolve": "metaharness-darwin evolve . --sandbox real --generations 3 --children 4",
+    "evolve:dry": "metaharness-darwin evolve . --sandbox mock --generations 2 --children 3"
+  },
+  "dependencies": {
+    "@metaharness/host-claude-code": "^0.1.0",
+    "@metaharness/kernel": "^0.1.0"
+  },
+  "devDependencies": {
+    "@metaharness/darwin": "^0.2.2",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": [
+    "trading",
+    "quant",
+    "agent-harness",
+    "backtesting"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

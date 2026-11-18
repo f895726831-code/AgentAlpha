@@ -1,0 +1,76 @@
+# 数据源配置
+data:
+  # Wind MCP 数据来源 (已弃用 — 2026-09-14)
+  # Wind MCP 每日调用额度下调，自动化管线已全面迁移至 akshare。
+  # 以下配置仅保留用于历史脚本（sync_data.py 等）。
+  wind:
+    json_dir: "D:/AgentAlpha/my-bot/data/wind"  # Wind MCP 输出的 JSON 目录
+    symbols_file: "D:/AgentAlpha/my-bot/data/watchlist.json"  # 标的列表
+
+  # Qlib 数据路径
+  qlib:
+    csv_dir: "D:/qlib/qlib_data/source/cn_1d"
+    bin_dir: "D:/qlib/qlib_data/cn_data"
+    freq: "day"
+    region: "cn"
+
+  # 数据同步
+  sync:
+    schedule: "daily_after_close"  # 每日盘后自动同步
+    retention_days: 1825  # 保留 5 年数据
+    auto_dump_bin: true
+
+  # Point-in-Time 数据引擎
+  pit:
+    enabled: true
+    # 数据发布延迟：财务数据 T+30 天，行情数据 T+0
+    release_delays:
+      financial: 30   # 财报发布延迟（天）
+      market: 0        # 行情数据实时可用
+    # 禁止的前瞻操作符
+    forbidden_operations:
+      - "shift(-1)"
+      - "shift(-"
+      - ".iloc[i+"
+      - ".iloc[i +"
+      - "look_ahead"
+      - "future"
+      - "peek"
+
+# ── Layer 0 & 1 新增配置（2026-09-09）──
+
+# Layer 0: 宏观大类资产配置
+macro_allocation:
+  enabled: true
+  rebalance:
+    frequency: "weekly"
+    time: "08:30"
+  data:
+    cache_dir: "data/macro_assets"
+    etf_history_years: 15
+    edb_history_years: 20
+  constraints:
+    min_per_asset: 0.05
+    max_per_asset: 0.35
+    min_cash: 0.10
+    max_commodity_total: 0.30
+    max_overseas_total: 0.40
+  output:
+    allocation_file: "data/output/asset_allocation.json"
+    allocation_latest: "data/output/asset_allocation_latest.json"
+
+# Layer 1: 板块轮动 ML
+sector_rotation:
+  enabled: true
+  data:
+    start_date: "2010-01-01"
+    cache_dir: "data/sector"
+  sectors:
+    count: 31
+    source: "sw_level_1"
+  models:
+    primary: "sector_gbdt"
+    ensemble: ["sector_gbdt", "sector_xgboost"]
+  output:
+    signal_file: "data/output/sector_signals.json"
+    signal_latest: "data/output/sector_signals_latest.json"

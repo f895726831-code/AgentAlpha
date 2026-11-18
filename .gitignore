@@ -1,0 +1,190 @@
+# ─── Secrets & Environment ───
+.env
+.env.*
+*.key
+*.pem
+credentials.json
+service-account.json
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
+
+# ─── Virtual Environment ───
+venv/
+.venv/
+env/
+.env/
+
+# ─── IDE & Editor ───
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Testing ───
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+
+# ─── Project Output ───
+data/backtest_results/
+data/output/backtests/
+data/output/logs/
+data/output/signals/
+data/output/factors/
+*.log
+
+# ─── Claude & AI ───
+.claude/
+.harness/
+.claude-code/
+CLAUDE.md
+
+# ─── Qlib Data (large binaries) ───
+D:/qlib/
+qlib_data/
+
+# ─── Jupyter ───
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── Misc ───
+*.tmp
+*.temp
+temp_*
+.cache/
+
+# ─── ML Training Artifacts ───
+catboost_info/
+mlruns/
+pickle_cache/
+git_ignore_folder/
+
+# ─── Global Factor Data (large, downloadable from S3/GitHub) ───
+my-bot/data/global_factors/*.zip
+my-bot/data/global_factors/*.html
+my-bot/data/global_factors/jkp_extracted/
+my-bot/data/global_factors/jkp_availability.json
+my-bot/data/global_factors/jkp_*.csv
+my-bot/data/global_factors/ff5_*.zip
+my-bot/data/global_factors/ff_*.zip
+my-bot/data/global_factors/Developed_5_Factors.csv
+my-bot/data/global_factors/Emerging_5_Factors.csv
+my-bot/data/global_factors/F-F_Momentum_Factor.csv
+my-bot/data/global_factors/Global_5_Factors_Daily.csv
+my-bot/data/global_factors/jkp_*.js
+my-bot/data/global_factors/jkp_*.pdf
+
+# ─── Temp test/experiment scripts ───
+my-bot/data/_test_*
+my-bot/data/_run_*
+my-bot/tmp_*
+
+# ─── Dynamic logs ───
+my-bot/logs/cron/*.txt
+
+# ─── Workbuddy session data ───
+my-bot/.workbuddy/
+
+# ─── Temp/stale intermediate output ───
+my-bot/data/output/_*
+
+# ─── Healthcheck logs ───
+my-bot/alerts/healthcheck.log
+
+# ─── NPM Dependencies ───
+node_modules/
+my-bot/node_modules/
+
+# ─── Debug Logs ───
+log/
+
+# ─── Personal/Trading Data (whitelist config-only) ───
+my-bot/data/*
+!my-bot/data/schemas/
+!my-bot/data/risk-policy.json
+!my-bot/data/sector-map.json
+!my-bot/data/blacklist.json
+!my-bot/data/llm_strategy_config.json
+
+# ─── Runtime Output Artifacts ───
+my-bot/data/output/*.json
+signal-factory/data/output/*.json
+data/output/
+
+# ─── Signal Factory ML Artifacts ───
+signal-factory/catboost_info/
+signal-factory/mlruns/
+signal-factory/pickle_cache/
+signal-factory/git_ignore_folder/
+signal-factory/logs/
+signal-factory/.pytest_cache/
+signal-factory/validation_logs/
+
+# ─── Stale/duplicate paths ───
+my-bot/data/global_factors/my-bot/
+/reports/
+my-bot/reports/
+
+# ─── ML Model Weights ───
+*.pt
+*.pth
+*.h5
+*.joblib
+*.onnx
+my-bot/scripts/wsl2/checkpoints/
+
+# ─── Runtime Logs (all, not just .txt) ───
+my-bot/logs/
+
+# ─── Temp Directories ───
+my-bot/tmp/
+tmp/
+
+# ─── Local Config Backups ───
+*.local.json
+*.bak
+
+# ─── Personal Watchlist ───
+my-bot/xueqiu_watchlist.json
+
+# ─── Alert Outputs ───
+my-bot/alerts/
+
+# ─── Signal Logs ───
+my-bot/signals.jsonl
+
+# ─── Portfolio (sensitive, user-provided) ───
+my-bot/portfolio.json
+
+# ─── GFlowNet Runtime Outputs ───
+my-bot/scripts/wsl2/agent_results_*.json
+my-bot/scripts/wsl2/factory_*_results.json
+my-bot/scripts/wsl2/gfn_pool_*.json
+my-bot/scripts/wsl2/data/
+my-bot/scripts/wsl2/results/
+
+# ─── Wind-Sourced Data ───
+my-bot/data/wind/
+
+# ─── Fundamental Data CSVs ───
+data/fundamental/
+my-bot/data/fundamental/
+
+# ─── Binary Reports ───
+my-bot/reports/**/*.pdf

@@ -1,0 +1,163 @@
+{
+  "603256": {
+    "ban_until": "2026-12-09",
+    "last_loss": -44.69,
+    "last_date": "2026-09-16",
+    "occurrences": 1,
+    "reason": "5d loss -44.7% on 2026-09-16"
+  },
+  "600363": {
+    "ban_until": "2027-01-28",
+    "last_loss": -19.01,
+    "last_date": "2026-10-20",
+    "occurrences": 10,
+    "reason": "5d loss -19.0% on 2026-10-20 (x10)"
+  },
+  "301611": {
+    "ban_until": "2026-12-19",
+    "last_loss": -31.19,
+    "last_date": "2026-09-18",
+    "occurrences": 2,
+    "reason": "5d loss -31.2% on 2026-09-18 (x2)"
+  },
+  "600378": {
+    "ban_until": "2026-12-09",
+    "last_loss": -16.77,
+    "last_date": "2026-09-16",
+    "occurrences": 1,
+    "reason": "5d loss -16.8% on 2026-09-16"
+  },
+  "600497": {
+    "ban_until": "2026-12-29",
+    "last_loss": -20.88,
+    "last_date": "2026-09-22",
+    "occurrences": 4,
+    "reason": "5d loss -20.9% on 2026-09-22 (x4)"
+  },
+  "688172": {
+    "ban_until": "2026-12-19",
+    "last_loss": -15.67,
+    "last_date": "2026-09-30",
+    "occurrences": 2,
+    "reason": "5d loss -15.7% on 2026-09-30 (x2)"
+  },
+  "300136": {
+    "ban_until": "2026-12-09",
+    "last_loss": -16.66,
+    "last_date": "2026-09-29",
+    "occurrences": 1,
+    "reason": "5d loss -16.7% on 2026-09-29"
+  },
+  "300223": {
+    "ban_until": "2026-12-09",
+    "last_loss": -25.32,
+    "last_date": "2026-09-29",
+    "occurrences": 1,
+    "reason": "5d loss -25.3% on 2026-09-29"
+  },
+  "001309": {
+    "ban_until": "2026-12-19",
+    "last_loss": -41.12,
+    "last_date": "2026-09-30",
+    "occurrences": 2,
+    "reason": "5d loss -41.1% on 2026-09-30 (x2)"
+  },
+  "688347": {
+    "ban_until": "2026-12-09",
+    "last_loss": -15.37,
+    "last_date": "2026-09-29",
+    "occurrences": 1,
+    "reason": "5d loss -15.4% on 2026-09-29"
+  },
+  "600105": {
+    "ban_until": "2026-12-09",
+    "last_loss": -17.19,
+    "last_date": "2026-09-29",
+    "occurrences": 1,
+    "reason": "5d loss -17.2% on 2026-09-29"
+  },
+  "002281": {
+    "ban_until": "2026-12-29",
+    "last_loss": -19.72,
+    "last_date": "2026-10-22",
+    "occurrences": 4,
+    "reason": "5d loss -19.7% on 2026-10-22 (x4)"
+  },
+  "603699": {
+    "ban_until": "2026-12-09",
+    "last_loss": -18.77,
+    "last_date": "2026-09-30",
+    "occurrences": 1,
+    "reason": "5d loss -18.8% on 2026-09-30"
+  },
+  "300285": {
+    "ban_until": "2026-12-24",
+    "last_loss": -16.07,
+    "last_date": "2026-10-14",
+    "occurrences": 3,
+    "reason": "5d loss -16.1% on 2026-10-14 (x3)"
+  },
+  "688411": {
+    "ban_until": "2026-12-09",
+    "last_loss": -17.66,
+    "last_date": "2026-10-12",
+    "occurrences": 1,
+    "reason": "5d loss -17.7% on 2026-10-12"
+  },
+  "301526": {
+    "ban_until": "2026-12-24",
+    "last_loss": -20.34,
+    "last_date": "2026-10-14",
+    "occurrences": 3,
+    "reason": "5d loss -20.3% on 2026-10-14 (x3)"
+  },
+  "688498": {
+    "ban_until": "2026-12-24",
+    "last_loss": -16.86,
+    "last_date": "2026-10-20",
+    "occurrences": 3,
+    "reason": "5d loss -16.9% on 2026-10-20 (x3)"
+  },
+  "300567": {
+    "ban_until": "2026-12-19",
+    "last_loss": -18.55,
+    "last_date": "2026-10-16",
+    "occurrences": 2,
+    "reason": "5d loss -18.6% on 2026-10-16 (x2)"
+  },
+  "600601": {
+    "ban_until": "2026-12-09",
+    "last_loss": -21.74,
+    "last_date": "2026-10-20",
+    "occurrences": 1,
+    "reason": "5d loss -21.7% on 2026-10-20"
+  },
+  "002008": {
+    "ban_until": "2026-12-09",
+    "last_loss": -38.37,
+    "last_date": "2026-10-21",
+    "occurrences": 1,
+    "reason": "5d loss -38.4% on 2026-10-21"
+  },
+  "688629": {
+    "ban_until": "2026-12-19",
+    "last_loss": -16.2,
+    "last_date": "2026-10-22",
+    "occurrences": 2,
+    "reason": "5d loss -16.2% on 2026-10-22 (x2)"
+  },
+  "002409": {
+    "ban_until": "2026-12-09",
+    "last_loss": -16.2,
+    "last_date": "2026-10-22",
+    "occurrences": 1,
+    "reason": "5d loss -16.2% on 2026-10-22"
+  },
+  "300475": {
+    "ban_until": "2026-12-09",
+    "last_loss": -17.69,
+    "last_date": "2026-10-28",
+    "occurrences": 1,
+    "reason": "5d loss -17.7% on 2026-10-28"
+  }
+}

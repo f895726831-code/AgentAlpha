@@ -1,0 +1,666 @@
+{
+  "$schema": "./risk-policy.schema.json",
+  "version": "4.3",
+  "updated": "2026-08-04",
+  "description": "v4.3 管线风险参数，按模式动态切换。权威来源，CLAUDE.md 中的表格为摘要。2026-08-04 新增 backtest_gate 反过拟合机制 + risk_off 解除条件。",
+  "backtest_gate": {
+    "description": "回测关（Gate 1）— v4.1 引入，v4.3 增强反过拟合机制。新策略/新形态在进入 signal-gen 前必须通过。",
+    "scoring": {
+      "dimensions": {
+        "sample_size": { "weight": 20, "description": "历史交易笔数。≥30 笔满分，<10 笔 ≤ 10 分，<5 笔 ≤ 5 分。1 笔交易的 Deploy 是假 Deploy。" },
+        "expectancy": { "weight": 25, "description": "期望值。平均盈亏比 × 胜率。负数直接 Abandon。" },
+        "risk_control": { "weight": 25, "description": "风控质量。最大回撤、连续亏损次数、最大单笔亏损。MaxDD > 30% → 此项 ≤ 10 分。" },
+        "robustness": { "weight": 20, "description": "稳健性。参数敏感性、不同市场环境下的表现一致性。" },
+        "execution_feasibility": { "weight": 10, "description": "执行可行性。信号出现频率、滑点估计、流动性。" }
+      },
+      "thresholds": {
+        "deploy": { "min": 70, "action": "策略可进入 signal-gen 选股" },
+        "refine": { "min": 40, "max": 69, "action": "策略需优化，优化后重新回测" },
+        "abandon": { "max": 39, "action": "策略放弃，终止后续阶段" }
+      }
+    },
+    "anti_overfitting": {
+      "description": "三层反过拟合防线。回测不是验证'能赚多少'，而是验证'在什么情况下会死'。",
+      "layer_1_out_of_sample": {
+        "description": "样本外留出验证。防止在开发和测试之间反复迭代导致的数据泄露。",
+        "rule": "回测数据按时间切分为开发集（前 70%）和验证集（后 30%）。策略仅在开发集上迭代，最终 Deploy 判決必须在验证集上跑一次且满足以下条件。",
+        "fail_condition": "验证集评分 < 开发集评分 - 15 分 → 过拟合，强制降级为 Refine，标记'样本外衰减'",
+        "exception": "历史交易笔数 < 15 笔时，样本外验证可跳过（样本太小，切分无意义），但需标注'样本不足，结论不可靠'"
+      },
+      "layer_2_complexity_penalty": {
+        "description": "策略复杂度惩罚。参数越多越可能过拟合，简单策略更可靠。",
+        "penalty_table": [
+          { "params": "1-2 个（触价即入 + 止损）", "penalty": 0, "note": "最简策略，无惩罚" },
+          { "params": "3-4 个（加止盈/确认条件）", "penalty": -5, "note": "合理复杂度" },
+          { "params": "5-6 个（加过滤/均线/量比）", "penalty": -10, "note": "偏高，需警惕" },
+          { "params": "7 个以上", "penalty": -15, "note": "强制标记'疑似过拟合'，即使总分 ≥ 70 也降级为 Refine" }
+        ],
+        "parameter_counting": "每个独立数值参数计 1 个（如止损百分比、止盈百分比、均线周期、量比阈值）。同一参数的不同档位测试（参数敏感性分析）不计入。",
+        "application": "复杂度惩罚在 5 维评分之后、阈值判決之前扣减。即：adjusted_score = raw_score + complexity_penalty"
+      },
+      "layer_3_walk_forward": {
+        "description": "时序滚动窗口验证。随机切分在时间序列上无效，必须按时间顺序滚动。",
+        "rule": "当历史交易笔数 ≥ 30 且数据跨度 ≥ 3 年时，建议执行滚动窗口验证。",
+        "windows": [
+          "训练: 前 2 年 → 测试: 第 3 年",
+          "训练: 前 2.5 年 → 测试: 最近半年"
+        ],
+        "pass_condition": "所有窗口测试期评分 ≥ 40（Refine 以上），且最差窗口评分 ≥ 最高窗口评分 × 0.6",
+        "fail_condition": "任一窗口评分 < 40 → 策略不稳定，降级为 Refine",
+        "optional": true,
+        "note": "滚动窗口验证为可选（须有 ≥3 年数据），但执行后结果优先于单次回测。不建议在每次管线运行时都执行，仅在新策略首次验证或参数大改时使用。"
+      }
+    },
+    "multiple_comparison": {
+      "description": "多重比较修正。同时测试 N 个策略只取最优的 → Bonferroni 陷阱。",
+      "rule": "同时测试 N 个策略变体时，Deploy 阈值上浮 5 × log₂(N) 分。例如：测试 4 个策略 → 阈值 70 + 5×2 = 80。",
+      "note": "这迫使你事先想清楚哪个策略最有道理，而不是撒网捞鱼。"
+    },
+    "mandatory_questions": {
+      "description": "回测报告必须回答的三个问题，缺一不可。回答不了 = 回测不完整。",
+      "questions": [
+        "1. 最大回撤发生在什么时候？当时的市场状态是什么？（进攻/震荡/防守）",
+        "2. 连续亏损最多几笔？最大单笔亏损是多少？按当前仓位你能不能扛住？",
+        "3. 策略在上涨/下跌/震荡三种环境下的表现差异有多大？（按 market_regime 分别统计）"
+      ]
+    }
+  },
+  "debate_gate": {
+    "description": "多空论战关（Gate 2）— v4.3 新增。建仓/持仓管理决策前强制五维论证。资金面拆分为资金流向(15%)+拥挤度(10%)，拥挤度评估因子/信号拥挤导致的 alpha 衰减风险。",
+    "weights": {
+      "technical": { "weight": 0.30, "description": "技术面" },
+      "capital_flow": { "weight": 0.15, "description": "资金流向（北向/主力/机构动向）" },
+      "crowding": { "weight": 0.10, "description": "拥挤度（因子拥挤/信号拥挤 → alpha 衰减风险）" },
+      "fundamental": { "weight": 0.20, "description": "基本面" },
+      "sentiment": { "weight": 0.15, "description": "情绪面" },
+      "macro": { "weight": 0.10, "description": "宏观面" }
+    },
+    "earnings_season_weights": {
+      "technical": { "weight": 0.20, "description": "技术面（财报季权重下调）" },
+      "earnings": { "weight": 0.10, "description": "财报面（财报季新增）" },
+      "capital_flow": { "weight": 0.15, "description": "资金流向" },
+      "crowding": { "weight": 0.10, "description": "拥挤度" },
+      "fundamental": { "weight": 0.20, "description": "基本面" },
+      "sentiment": { "weight": 0.15, "description": "情绪面" },
+      "macro": { "weight": 0.10, "description": "宏观面" }
+    },
+    "scoring": {
+      "scale": { "min": 1, "max": 5, "description": "每个维度 Bull 和 Bear 独立评分 1-5" },
+      "formula": "Net_Score = Bull_Score - Bear_Score",
+      "bull_formula": "Bull_Score = Σ(weight × bull_score_per_dimension)",
+      "bear_formula": "Bear_Score = Σ(weight × bear_score_per_dimension)",
+      "range": "Net_Score ∈ [-4.0, +4.0]"
+    },
+    "crowding": {
+      "description": "拥挤度子维度 — 评估因子/信号拥挤导致的 alpha 衰减风险。拥挤不是'用的人多了不灵'，而是通过容量耗尽、前置交易、相关性坍缩三个机制侵蚀 alpha。",
+      "scoring_logic": {
+        "bull": "拥挤度越低 → Bull 分越高。低拥挤意味着 alpha 纯度高，策略容量充裕，独立性强。",
+        "bear": "拥挤度越高 → Bear 分越高。高拥挤意味着 alpha 已衰减，面临前置交易和踩踏风险。",
+        "note": "Bull 和 Bear 独立评分。一个标的可以同时 Bull=4（机构持仓低，不拥挤）和 Bear=2（换手率偏高，有博弈加剧迹象）。"
+      },
+      "indicators": {
+        "analyst_coverage": {
+          "description": "分析师覆盖密度 — 覆盖越多、评级越一致看多，拥挤度越高",
+          "data_source": "Wind 一致预期 (stock_data)",
+          "bear_threshold": "覆盖券商 > 20 家且 ≥ 90% 评级为'买入/增持' → Bear ≥ 4",
+          "bull_threshold": "覆盖券商 < 5 家或存在分歧（买入/卖出并存）→ Bull ≥ 4",
+          "weight_in_crowding": 0.25
+        },
+        "institutional_concentration": {
+          "description": "机构持仓集中度 — 前十大机构持股占比越高、环比上升越快，拥挤度越高",
+          "data_source": "Wind 股东数据 (stock_data.get_stock_shareholders)",
+          "bear_threshold": "前 10 大机构持股 > 40% 且环比上升 > 5pp → Bear ≥ 4",
+          "bull_threshold": "前 10 大机构持股 < 20% 或环比下降 → Bull ≥ 4",
+          "weight_in_crowding": 0.25
+        },
+        "turnover_anomaly": {
+          "description": "换手率异常 — 高位高换手意味着博弈激烈，拥挤度高",
+          "data_source": "日线数据 CHANGEHANDRATE 字段",
+          "bear_threshold": "20 日均换手率 > 历史 80 分位 且 股价在 60 日高点 10% 以内 → Bear ≥ 4",
+          "bull_threshold": "20 日均换手率 < 历史 50 分位 → Bull ≥ 4",
+          "weight_in_crowding": 0.20
+        },
+        "margin_balance_ratio": {
+          "description": "两融余额占比 — 融资余额/流通市值越高，杠杆拥挤度越高",
+          "data_source": "Wind 融资融券数据 (stock_data)",
+          "bear_threshold": "融资余额/流通市值 > 5% 且连续 5 日上升 → Bear ≥ 4",
+          "bull_threshold": "融资余额/流通市值 < 2% → Bull ≥ 4",
+          "weight_in_crowding": 0.15
+        },
+        "public_sentiment_heat": {
+          "description": "舆论热度 — 提及量异常飙升意味着散户拥挤",
+          "data_source": "Wind 新闻/公告 (financial_docs.search_news)",
+          "bear_threshold": "近 30 日提及量 > 历史均值 3σ → Bear ≥ 4",
+          "bull_threshold": "近 30 日提及量 < 历史均值 + 1σ → Bull ≥ 4",
+          "weight_in_crowding": 0.15
+        }
+      },
+      "crowding_override": {
+        "description": "拥挤度极端值时的超驰规则。当拥挤度达到极端水平时，即使其他维度支持建仓，也应采取保护措施。",
+        "extreme_crowding": {
+          "condition": "Crowding_Bear ≥ 4 且 Crowding_Bull ≤ 2（即拥挤度指标中 ≥ 3 个触发危险阈值）",
+          "actions": {
+            "profit_target": "原始止盈目标 × 0.7（拥挤退出时大家都在卖，跑不掉）",
+            "position_size": "原始仓位 × 0.5（拥挤崩盘时相关性趋近于 1，分散无效）",
+            "take_profit_batches": "分批止盈从 3 批改为 2 批（先跑先赢）",
+            "stop_loss_tighten": "止损线收紧 1%（拥挤踩踏时流动性蒸发，滑点远超预期）"
+          }
+        }
+      }
+    },
+    "thresholds": {
+      "entry": {
+        "green": { "min": 2.0, "light": "🟢", "action": "标准仓位", "position_multiplier": 1.0 },
+        "yellow": { "min": 0.5, "max": 2.0, "light": "🟡", "action": "半仓", "position_multiplier": 0.5 },
+        "orange": { "min": -0.5, "max": 0.5, "light": "🟠", "action": "观望不建仓", "position_multiplier": 0.0 },
+        "red": { "max": -0.5, "light": "🔴", "action": "不建仓，从候选移除", "position_multiplier": 0.0 }
+      },
+      "position_management": {
+        "add": {
+          "green": { "min": 2.0, "light": "🟢", "action": "按标准比例加仓" },
+          "yellow": { "min": 0.5, "max": 2.0, "light": "🟡", "action": "加仓比例减半" },
+          "orange": { "min": -0.5, "max": 0.5, "light": "🟠", "action": "不加仓" },
+          "red": { "max": -0.5, "light": "🔴", "action": "不加仓" }
+        },
+        "reduce": {
+          "green": { "min": 2.0, "light": "🟢", "action": "不减仓" },
+          "yellow": { "min": 0.5, "max": 2.0, "light": "🟡", "action": "观望，不操作" },
+          "orange": { "min": -0.5, "max": 0.5, "light": "🟠", "action": "考虑减仓 30-50%" },
+          "red": { "max": -0.5, "light": "🔴", "action": "立即清仓（即使未触及止损线）" }
+        }
+      }
+    },
+    "mode_behavior": {
+      "normal": "完整五维论证（含拥挤度），标准阈值",
+      "earnings_season": "五维（含拥挤度）+ 财报专项维度，调整权重",
+      "risk_off": "跳过（不建仓，无需论证）",
+      "el_nino": "完整五维论证，宏观维度权重重调（25%），农业/化工板块做多偏好，食品饮料/饲料养殖做空偏好"
+    }
+  },
+  "strategy_bias": {
+    "description": "市场状态自适应策略偏好 — 管线不是固定偏左或偏右，而是随沪深300的技术状态自动切换。解决左侧交易在下跌趋势中反复试错、右侧交易在拥挤信号中追高的问题。",
+    "bias_determination": {
+      "indicator": "沪深300 收盘价 vs MA20 + MA20 方向",
+      "refresh": "每个交易日盘前 market-watcher 判档时同步更新",
+      "override": "risk_off 模式下强制左侧优先（禁止追涨），无论指数状态"
+    },
+    "regimes": {
+      "right_priority": {
+        "condition": "沪深300 收盘 > MA20 且 MA20 方向向上（连续 3 日走高）",
+        "description": "右侧优先 — 趋势确认，顺势而为",
+        "strategy_weights": {
+          "T1_breakout": { "weight": 1.5, "note": "强势突破，权重提升" },
+          "T4_golden_cross": { "weight": 1.5, "note": "均线金叉，权重提升" },
+          "VCP_breakout": { "weight": 1.5, "note": "VCP收缩突破，权重提升" },
+          "T2_pullback": { "weight": 0.5, "note": "回调低吸，降为辅助" },
+          "T3_oversold_bounce": { "weight": 0.0, "note": "超跌反弹，禁用" },
+          "T5_earnings": { "weight": 1.0, "note": "财报驱动，标准权重" },
+          "T6_capital": { "weight": 1.0, "note": "资金驱动，标准权重" },
+          "canslim": { "weight": 1.0, "note": "CANSLIM成长股，标准权重" }
+        },
+        "gate2_adjustment": {
+          "technical_bull_floor": "技术面 Bull 分 ≥ 3（趋势确认阶段，技术面不能弱）",
+          "crowding_alert": "右侧策略拥挤风险最高，拥挤度 Bear ≥ 4 → 强制降级为半仓"
+        }
+      },
+      "left_priority": {
+        "condition": "沪深300 收盘 < MA20 或 MA20 方向向下",
+        "description": "左侧优先 — 趋势未确认，低吸优于追高",
+        "strategy_weights": {
+          "T2_pullback": { "weight": 1.5, "note": "回调低吸，权重提升" },
+          "T3_oversold_bounce": { "weight": 1.0, "note": "超跌反弹，标准权重（谨慎）" },
+          "T5_earnings": { "weight": 1.0, "note": "财报驱动，标准权重" },
+          "T1_breakout": { "weight": 0.0, "note": "强势突破，禁用（趋势向下时突破多为假突破）" },
+          "T4_golden_cross": { "weight": 0.0, "note": "均线金叉，禁用（震荡市中假信号多）" },
+          "VCP_breakout": { "weight": 0.0, "note": "VCP突破，禁用" },
+          "T6_capital": { "weight": 0.5, "note": "资金驱动，降级（主力在左侧也可能被套）" },
+          "canslim": { "weight": 0.5, "note": "CANSLIM成长股，降级（左侧需基本面安全边际保底）" }
+        },
+        "gate2_adjustment": {
+          "sentiment_bear_floor": "情绪面 Bear 分 ≥ 2（左侧环境市场情绪偏空，需确认恐慌程度）",
+          "stop_loss_tighten": "止损线额外收紧 0.5%（左侧环境假突破多，保护加深）"
+        }
+      },
+      "balanced": {
+        "condition": "沪深300 在 MA20 ± 1% 范围内震荡，MA20 走平",
+        "description": "均衡 — 方向不明，左右各半，Gate 2 严格把关",
+        "strategy_weights": {
+          "T1_breakout": { "weight": 1.0 },
+          "T2_pullback": { "weight": 1.0 },
+          "T4_golden_cross": { "weight": 1.0 },
+          "T5_earnings": { "weight": 1.0 },
+          "T6_capital": { "weight": 1.0 },
+          "T3_oversold_bounce": { "weight": 1.0 },
+          "VCP_breakout": { "weight": 1.0 },
+          "canslim": { "weight": 1.0, "note": "CANSLIM成长股，标准权重" }
+        },
+        "gate2_adjustment": {
+          "net_score_floor": "Net_Score ≥ 1.0（震荡市提高门槛，多空必须明显倾斜）",
+          "note": "震荡市中 Gate 2 的 Net_Score 阈值从 0.5 提升至 1.0，减少反复进出"
+        }
+      }
+    }
+  },
+  "modes": {
+    "normal": {
+      "description": "日常模式 — 标准风控参数",
+      "concentration": {
+        "main_board": { "max_pct": 10, "description": "主板/创业板 (600xxx/000xxx/300xxx)" },
+        "star_board": { "max_pct": 30, "description": "科创板 (688xxx)" },
+        "hk_board": { "max_pct": 15, "description": "港股" }
+      },
+      "circuit_breakers": {
+        "daily_loss_pct": -2.0,
+        "daily_loss_description": "日亏损超过该百分比触发熔断，当日停止交易",
+        "consecutive_losses": 5,
+        "consecutive_losses_description": "连续亏损交易次数达到该值触发熔断"
+      },
+      "allow_new_positions": true
+    },
+    "earnings_season": {
+      "description": "财报季模式 — 激活财报子管线，盘前/盘后闭环增强",
+      "concentration": {
+        "main_board": { "max_pct": 10, "description": "主板/创业板 (600xxx/000xxx/300xxx)" },
+        "star_board": { "max_pct": 30, "description": "科创板 (688xxx)" },
+        "hk_board": { "max_pct": 15, "description": "港股" }
+      },
+      "circuit_breakers": {
+        "daily_loss_pct": -2.0,
+        "daily_loss_description": "日亏损超过该百分比触发熔断，当日停止交易",
+        "consecutive_losses": 5,
+        "consecutive_losses_description": "连续亏损交易次数达到该值触发熔断"
+      },
+      "allow_new_positions": true,
+      "earnings_specific": {
+        "pre_earnings_days": 5,
+        "pre_earnings_position_pct": 50,
+        "description": "财报前 N 天，持仓仓位降至 X%"
+      }
+    },
+    "risk_off": {
+      "description": "防守模式 — 风控全面收紧，禁止新建仓",
+      "entry_conditions": {
+        "description": "触发 risk_off 的条件（任一满足即触发）",
+        "triggers": [
+          "market_regime_switch 判档为'防守'",
+          "沪深300 连续 3 日收于 20 日均线下方且 20 日均线向下",
+          "科创50 20 日跌幅 > 12%（半导体/科技板块系统性风险）",
+          "连续亏损熔断触发（日熔断或连续亏损熔断）",
+          "单日涨跌比 < 0.3（上涨家数/下跌家数）且沪深300 跌幅 > 1.5%"
+        ]
+      },
+      "exit_conditions": {
+        "description": "解除 risk_off 的条件 — 两阶段递进：risk_off → 震荡（半仓可建仓）→ 进攻（正常满仓）。不可直接跳回 normal。",
+        "phase_1_to_ranging": {
+          "description": "risk_off → 震荡（仓位可恢复至 new normal 的 50%，Gate 2 恢复五维论证）",
+          "index_conditions": {
+            "description": "指数层面，必须全部满足",
+            "csi300_no_new_low": "沪深300 连续 3 个交易日不创新低，且收盘价 > 前低 + 1%",
+            "star50_stabilize": "科创50 连续 3 个交易日收盘价 > 5 日均线",
+            "volume_recovery": "沪深300 连续 2 个交易日成交额 > 20 日均量的 80%"
+          },
+          "micro_conditions": {
+            "description": "微观层面，至少满足 2/3",
+            "breadth_improve": "连续 2 个交易日上涨家数 > 下跌家数",
+            "offensive_sector_return": "半导体/电子/通信中至少 2 个板块日涨幅 > 1.5%",
+            "limit_down_fade": "非ST跌停家数 < 20 家"
+          },
+          "confirmation": "所有条件满足后，需额外 1 个交易日不出现否定信号（低开低走/科创50 跌幅 > 2%）才确认切换"
+        },
+        "phase_2_to_normal": {
+          "description": "震荡 → 进攻（仓位恢复正常，Gate 2 标准阈值）",
+          "conditions": "在震荡模式运行至少 2 个交易日后，沪深300 站上 20 日均线 + 20 日均线走平或向上 + 连续 2 日涨跌比 > 1.5",
+          "confirmation": "条件满足后，次日开盘前确认切换"
+        },
+        "fallback": {
+          "description": "退回 risk_off 的条件",
+          "triggers": [
+            "震荡期间沪深300 跌破前低",
+            "震荡期间科创50 单日跌幅 > 4%",
+            "震荡期间连续 2 日涨跌比 < 0.5"
+          ]
+        },
+        "earnings_season_override": {
+          "description": "财报季期间解除 risk_off 的特殊规则",
+          "rule": "满足 phase_1 条件后，先进入 earnings_season 模式（而非震荡），财报季结束后再评估是否进入 normal",
+          "reason": "财报季即使市场企稳，个股层面仍有财报不确定性，不宜直接恢复进攻仓位"
+        }
+      },
+      "concentration": {
+        "main_board": { "max_pct": 5, "description": "主板/创业板 (600xxx/000xxx/300xxx)" },
+        "star_board": { "max_pct": 20, "description": "科创板 (688xxx)" },
+        "hk_board": { "max_pct": 10, "description": "港股" }
+      },
+      "circuit_breakers": {
+        "daily_loss_pct": -1.5,
+        "daily_loss_description": "日亏损超过该百分比触发熔断，当日停止交易",
+        "consecutive_losses": 3,
+        "consecutive_losses_description": "连续亏损交易次数达到该值触发熔断"
+      },
+      "allow_new_positions": false
+    },
+    "el_nino": {
+      "description": "厄尔尼诺模式 — 超强厄尔尼诺事件期间激活，农产品/农业上游偏多，通胀对冲，EM减配。基于 NOAA ONI ≥ 2.5°C 触发。",
+      "entry_conditions": {
+        "description": "触发 el_nino 模式的条件（需满足主条件 + 至少1个确认条件）",
+        "primary": "NOAA ONI ≥ 2.5°C（超强厄尔尼诺阈值），数据源：scripts/fetch_enso_data.py",
+        "confirmations": [
+          "国家气候中心确认超强厄尔尼诺事件",
+          "Niño-3.4 周度 SSTA ≥ 2.0°C 持续 4 周以上",
+          "ONI 连续 3 个月 ≥ 2.0°C"
+        ],
+        "auto_trigger": true,
+        "auto_trigger_note": "enso_data.json 中 classification.classification == 'super_el_nino' 时自动触发"
+      },
+      "exit_conditions": {
+        "description": "解除 el_nino 模式的条件（任一满足）",
+        "triggers": [
+          "ONI 连续 2 个月 < +1.0°C",
+          "ONI 连续 3 个月下降且最新值 < +1.5°C",
+          "东南亚/印度产区雨季降水恢复正常且 ONI < +2.0°C",
+          "2027年9月（夏秋季节转换，默认逐步退出）"
+        ],
+        "partial_exit": {
+          "description": "部分退出：ONI < +1.5°C 且趋势降温",
+          "action": "农产品仓位减半，A股农业轮动仓位减半，受损板块规避解除"
+        },
+        "full_exit": {
+          "description": "完全退出：ONI < +1.0°C 连续 2 个月",
+          "action": "平仓所有 El Niño 多头仓位，恢复 normal 模式默认配置"
+        },
+        "hard_exit": {
+          "description": "强制退出：任一策略回撤 > 20%",
+          "action": "该策略止损退出，不影响其他策略"
+        }
+      },
+      "concentration": {
+        "main_board": { "max_pct": 12, "description": "主板/创业板 — 农业上游板块适度放开集中度" },
+        "star_board": { "max_pct": 25, "description": "科创板" },
+        "hk_board": { "max_pct": 12, "description": "港股" }
+      },
+      "circuit_breakers": {
+        "daily_loss_pct": -2.5,
+        "daily_loss_description": "日亏损熔断 — 厄尔尼诺策略波动率较高，适度放宽",
+        "consecutive_losses": 5,
+        "consecutive_losses_description": "连续亏损交易熔断"
+      },
+      "allow_new_positions": true,
+      "el_nino_specific": {
+        "description": "厄尔尼诺模式专有配置",
+        "sector_overweights": {
+          "agriculture_forestry_fishery": {
+            "sw_code": "801010",
+            "name": "农林牧渔",
+            "weight_multiplier": 1.5,
+            "description": "种业/糖业/橡胶/化肥受益"
+          },
+          "chemical": {
+            "sw_code": "801030",
+            "name": "化工",
+            "weight_multiplier": 1.2,
+            "description": "化肥子行业受益"
+          },
+          "food_beverage": {
+            "sw_code": "801120",
+            "name": "食品饮料",
+            "weight_multiplier": 0.7,
+            "description": "下游原料成本抬升，减配"
+          },
+          "husbandry_feed": {
+            "name": "饲料养殖（子行业）",
+            "weight_multiplier": 0.5,
+            "description": "饲料成本上升，规避"
+          }
+        },
+        "commodity_strategies": {
+          "palm_oil": {
+            "direction": "long",
+            "allocation_pct": 40,
+            "hold_period_months": 18,
+            "stop_loss_pct": -15
+          },
+          "rubber": {
+            "direction": "long",
+            "allocation_pct": 30,
+            "hold_period_months": 18,
+            "stop_loss_pct": -15
+          },
+          "sugar": {
+            "direction": "long",
+            "allocation_pct": 30,
+            "hold_period_months": 18,
+            "stop_loss_pct": -15
+          }
+        },
+        "a_share_basket": {
+          "max_basket_pct": 15,
+          "composition": {
+            "seeds": { "pct": 30, "tickers": ["000998.SZ", "002041.SZ", "002385.SZ"], "names": ["隆平高科", "登海种业", "大北农"] },
+            "sugar": { "pct": 25, "tickers": ["600737.SH", "000833.SZ"], "names": ["中粮糖业", "粤桂股份"] },
+            "rubber": { "pct": 25, "tickers": ["601118.SH", "600500.SH"], "names": ["海南橡胶", "中化国际"] },
+            "fertilizer": { "pct": 20, "note": "氮/磷/钾肥龙头" }
+          },
+          "rebalance": "monthly",
+          "exit_signal": "ONI < +1.0°C 且北半球春季播种正常（4-5月确认）"
+        },
+        "em_allocation": {
+          "description": "新兴市场减配",
+          "hstech_weight_cap": 0.05,
+          "india_weight_cap": 0.02,
+          "nasdaq_weight_floor": 0.10
+        },
+        "gold_allocation": {
+          "hedge_pct": 10,
+          "description": "黄金对冲通胀风险，最低配置 10%"
+        },
+        "risk_scenarios": {
+          "baseline": { "probability": 0.55, "oni_peak": "3.2-3.5", "decay": "2027春快速衰减", "action": "全部策略执行" },
+          "extreme": { "probability": 0.25, "oni_peak": ">3.5", "decay": "持续至2027秋", "action": "农产品仓位加至40%，持仓延至24月" },
+          "rapid_decay": { "probability": 0.15, "oni_peak": "<3.0", "decay": "2027Q1回落", "action": "减半农产品仓位，提前止盈" },
+          "tail_risk": { "probability": 0.05, "description": "叠加地缘冲突/金融危机", "action": "全部平仓→现金+黄金" }
+        }
+      }
+    }
+  },
+  "universal": {
+    "position_sizing": {
+      "method": "fractional_kelly",
+      "kelly_multiplier": 0.25,
+      "description": "Fractional-Kelly with 0.25 multiplier — never bet full Kelly"
+    },
+    "trade_units": {
+      "main_board": 100,
+      "star_board": 200,
+      "hk_board": "varies",
+      "description": "最小交易单位（股）"
+    },
+    "paper_trading": true,
+    "live_trading_requires": ["RUFLO_TRADE_CONFIRM"],
+    "live_trading_description": "实盘需设置环境变量 RUFLO_TRADE_CONFIRM=true 且通过 --live 参数"
+  },
+  "macro_asset_allocation": {
+    "description": "Layer 0: 宏观大类资产配置（v1.0, 2026-09-09 新增）。7 类资产的四象限框架 + 多因子评分 + 风险预算组合构建。",
+    "enabled": true,
+    "rebalance_frequency": "weekly",
+    "rebalance_time": "08:30",
+    "assets": {
+      "oil": { "etf": "162411.SZ", "fallback": "501018.SH", "category": "commodity" },
+      "gold": { "etf": "518880.SH", "fallback": "159937.SZ", "category": "commodity" },
+      "bond": { "etf": "511010.SH", "fallback": "511260.SH", "category": "bond" },
+      "nasdaq": { "etf": "513100.SH", "fallback": "159941.SZ", "category": "equity" },
+      "hk_tech": { "etf": "513130.SH", "fallback": null, "category": "equity" },
+      "a_share": { "etf": "159919.SZ", "fallback": null, "category": "equity" },
+      "cash": { "etf": null, "repo": "GC001", "category": "cash" }
+    },
+    "constraints": {
+      "min_per_asset": 0.05,
+      "max_per_asset": 0.35,
+      "min_cash": 0.10,
+      "max_turnover_per_rebalance": 0.30,
+      "max_commodity_total": 0.30,
+      "max_overseas_total": 0.40
+    },
+    "scoring_weights": {
+      "momentum": 0.25,
+      "trend": 0.20,
+      "macro_match": 0.25,
+      "valuation": 0.15,
+      "vol_correlation": 0.10,
+      "fund_flow": 0.05
+    },
+    "active_views": {
+      "overweight_threshold": 60,
+      "neutral_min": 40,
+      "underweight_max": 40,
+      "zero_threshold": 20
+    },
+    "etf_rules": {
+      "stop_loss_atr_multiple": 2.0,
+      "position_sizing": "fractional_kelly_0.25",
+      "min_liquidity_daily_volume": 10000000
+    },
+    "mode_overrides": {
+      "risk_off": {
+        "a_share_max": 0.15,
+        "bond_min": 0.25,
+        "gold_min": 0.15,
+        "cash_min": 0.20
+      },
+      "el_nino": {
+        "description": "厄尔尼诺模式 — 减配新兴市场，增配黄金对冲通胀，维持债券高配",
+        "a_share_max": 0.20,
+        "gold_min": 0.15,
+        "gold_max": 0.25,
+        "bond_min": 0.20,
+        "oil_max": 0.05,
+        "hstech_max": 0.05,
+        "india_max": 0.02,
+        "nasdaq_floor": 0.10,
+        "commodity_ag_note": "农产品ETF/期货不在11资产池内，通过策略层执行"
+      }
+    },
+    "fallback": {
+      "normal": { "a_share": 0.30, "bond": 0.30, "cash": 0.20, "gold": 0.10, "hk_tech": 0.05, "nasdaq": 0.03, "oil": 0.02 },
+      "risk_off": { "bond": 0.30, "gold": 0.20, "cash": 0.25, "a_share": 0.15, "hk_tech": 0.05, "nasdaq": 0.03, "oil": 0.02 }
+    },
+    "validation": {
+      "min_annual_return": 0.06,
+      "max_annual_volatility": 0.12,
+      "min_sharpe": 0.6,
+      "max_drawdown": 0.20,
+      "min_asset_active_pct": 0.10,
+      "crisis_dd_ratio": 0.50
+    },
+    "output": {
+      "allocation_file": "data/output/asset_allocation.json",
+      "allocation_latest": "data/output/asset_allocation_latest.json"
+    }
+  },
+  "sector_rotation": {
+    "description": "Layer 1: 板块轮动 ML（v1.0, 2026-09-09 新增）。31 个申万一级行业的 GBDT/XGBoost 预测模型。",
+    "enabled": true,
+    "stage": "Stage 0.5",
+    "schedule": "daily_15:30",
+    "sectors": {
+      "count": 31,
+      "source": "sw_level_1",
+      "defense_sectors": ["801150", "801160", "801120", "801780"]
+    },
+    "models": {
+      "primary": "sector_gbdt",
+      "ensemble": ["sector_gbdt", "sector_xgboost"],
+      "baseline": "Option B — 个股 alpha 聚合"
+    },
+    "concentration": {
+      "max_sector_exposure": {
+        "normal": 0.30,
+        "earnings_season": 0.25,
+        "risk_off": 0.15
+      },
+      "min_sectors": {
+        "normal": 3,
+        "risk_off": 1
+      },
+      "max_single_sector_stocks": 5,
+      "rebalance_frequency": "weekly"
+    },
+    "mode_behavior": {
+      "normal": { "active": true, "top_n": 5, "filter": "all" },
+      "earnings_season": { "active": true, "top_n": 5, "earnings_boost": true },
+      "risk_off": { "active": false, "defense_only": true, "max_sectors": 2 },
+      "el_nino": {
+        "active": true,
+        "top_n": 5,
+        "filter": "all",
+        "description": "厄尔尼诺模式 — 农林牧渔/化工板块权重×1.5，食品饮料×0.7，饲料养殖子行业规避",
+        "sector_overrides": {
+          "801010": { "name": "农林牧渔", "weight_multiplier": 1.5 },
+          "801030": { "name": "化工", "weight_multiplier": 1.2 },
+          "801120": { "name": "食品饮料", "weight_multiplier": 0.7 }
+        }
+      }
+    },
+    "etf_fallback": {
+      "enabled": true,
+      "max_etf_position": 0.20,
+      "stop_loss_atr": 2.0,
+      "position_sizing": "fractional_kelly_0.25"
+    },
+    "validation": {
+      "ic_mean_min": 0.05,
+      "ic_ir_min": 0.3,
+      "ic_positive_rate_min": 0.55,
+      "long_only_sharpe_min": 0.5,
+      "must_beat_baseline": true
+    },
+    "anti_overfitting": {
+      "layer_1_oos": { "train": "2010-2020", "test": "2021-2026" },
+      "layer_2_complexity": { "penalty_per_param": 0.02, "max_params": 7 },
+      "layer_3_walk_forward": { "n_windows": 5, "train_years": 3, "test_months": 6 }
+    },
+    "output": {
+      "signal_file": "data/output/sector_signals.json",
+      "signal_latest": "data/output/sector_signals_latest.json"
+    }
+  },
+  "qlib": {
+    "description": "Qlib 整合层配置（Phase 1-3 已部署）。与 risk-policy 同文件以保持单点配置。",
+    "enabled": true,
+    "data_sync": {
+      "schedule": "daily_after_close",
+      "mode": "incremental",
+      "auto_dump_bin": true,
+      "input_dirs": [
+        "%USERPROFILE%/AppData/Local/Temp",
+        "%USERPROFILE%/.claude/projects/d--FM-trade"
+      ]
+    },
+    "backtest": {
+      "engine": "qlib",
+      "fallback": "manual",
+      "comment": "Phase 3 已部署。Qlib 引擎为默认回测引擎，手工回测为 fallback。",
+      "default_config": {
+        "account": 1000000,
+        "benchmark": "sh000300",
+        "exchange": {
+          "freq": "day",
+          "deal_price": "close",
+          "open_cost": 0.0003,
+          "close_cost": 0.0013,
+          "min_cost": 5,
+          "limit_threshold": 0.1
+        }
+      },
+      "anti_overfitting": {
+        "oos_ratio": 0.3,
+        "min_trades_for_oos": 15,
+        "walk_forward_windows": 2,
+        "risk_policy_ref": "backtest_gate.anti_overfitting"
+      },
+      "output": {
+        "dir": "data/backtest_results",
+        "save_gate1_scorecard": true
+      }
+    }
+  }
+}

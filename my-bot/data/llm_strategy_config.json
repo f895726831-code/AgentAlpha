@@ -1,0 +1,67 @@
+{
+  "regime": "风险回避",
+  "bias": "left_priority",
+  "mode": "risk_off",
+  "strategies": [
+    {
+      "type": "T1_breakout",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "T2_pullback",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "VCP_breakout",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "T3_oversold_bounce",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "T4_golden_cross",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "T5_earnings",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "T6_capital",
+      "active": false,
+      "params": {}
+    },
+    {
+      "type": "theme",
+      "active": false,
+      "params": {}
+    }
+  ],
+  "filters": {
+    "exclude_st": true,
+    "exclude_new_listings_days": 60
+  },
+  "meta": {
+    "compiled_by": "stable-timi-bridge",
+    "timestamp": "2026-10-21T16:48:08.338513",
+    "reasoning": "STABLE HMM 判风险回避 — 禁止开仓",
+    "bridge_details": {
+      "stable_mode": "risk_off",
+      "macro_quadrant": "扩张",
+      "macro_confidence": 0.7,
+      "technical_state": "panic",
+      "avg_rsi": 20.6,
+      "bearish_ratio": 0.907,
+      "oversold_ratio": 0.815,
+      "bond_weight": 0.5999999999528471,
+      "equity_weight": 0.13373667470284165
+    }
+  }
+}
