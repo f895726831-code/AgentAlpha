@@ -137,6 +137,18 @@ cd my-bot && npm test
 - 数据需自行准备：`signal-factory/scripts/update_daily.py`（akshare/baostock）或接入 Wind MCP；输出为 Qlib bin 格式。
 - `portfolio.json`、`my-bot/data/*`、`my-bot/reports/` 等运行数据已被 `.gitignore` 排除。
 
+## 安全扫描
+
+> GitHub 原生 **Secret scanning / Push protection** 对个人私有仓不可用（属于 GitHub Secret Protection，主要面向组织版；公开仓免费）。因此本仓库自带两层扫描：
+
+- **CI 全历史扫描**：`.github/workflows/secret-scan.yml`（TruffleHog OSS，push / PR / 每周一自动运行）
+- **本地扫描**：
+  ```powershell
+  winget install gitleaks          # 一次性安装
+  powershell -File scripts/secret_scan.ps1          # 扫描 git 历史 + 工作区
+  powershell -File scripts/secret_scan.ps1 -Files   # 仅扫描工作区
+  ```
+
 ## 第三方组件与许可
 
 本项目 MIT 许可；同时使用/参考了若干第三方组件（RD-Agent、Qlib、LightGBM、XGBoost、CatBoost、a-stock-data、Wind 技能模板等）。详见 [docs/THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md)。
